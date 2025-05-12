@@ -15,6 +15,10 @@ public class App
                                 "\n0.- Salir");
 
             opc = aux.Scanf.scanInt();
+            
+            //Para hacer un clear de la terminal
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
 
             switch (opc) {
                 case 0:
@@ -50,6 +54,10 @@ public class App
                                 "\n0.- Cerrar Sesión");
 
             opc = aux.Scanf.scanInt();
+
+            //Para hacer un clear de la terminal
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
 
             switch (opc) {
                 case 0: 
@@ -91,6 +99,10 @@ public class App
                                 "\n0.- Cerrar Sesión");
 
             opc = aux.Scanf.scanInt();
+
+            //Para hacer un clear de la terminal
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
 
             switch (opc) {
                 case 0: 
