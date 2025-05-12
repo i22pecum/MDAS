@@ -1,0 +1,6 @@
+mdas/mgr/TransaccionMgr.class
+mdas/mgr/Reclamacion_ConsultaMgr.class
+mdas/mgr/UsuarioMgr.class
+mdas/aux/Scanf.class
+mdas/mgr/EventoMgr.class
+mdas/main/App.class
