@@ -1,5 +1,6 @@
 package main;
 
+import dto.*;
 /**
  * Hello world!
  *
@@ -8,6 +9,8 @@ public class App
 {
     public static void main( String[] args ){
         int opc;
+        Usuario usuario = new Usuario();
+        String dni = "";
         do{
             System.out.println("\nSelecciona la acción que desees realizar:" +
                                 "\n1.- Registrarse" +
@@ -25,6 +28,19 @@ public class App
                     System.out.println("\nSaliendo de la aplicación");
                     break;
                 case 1:
+                    System.out.println("\nIntroduce tu correo:");
+                    usuario.setCorreo(aux.Scanf.scanString());
+                    System.out.println("\nIntroduce tu contraseña:");
+                    usuario.setContrasena(aux.Scanf.scanString());
+                    System.out.println("\nIntroduce tu nombre y apellidos:");
+                    usuario.setNombreCompleto(aux.Scanf.scanString());
+                    System.out.println("\nIntroduce tu numero de teléfono:");
+                    usuario.setTelefono(aux.Scanf.scanInt());
+                    System.out.println("\nIntroduce tu DNI:");
+                    dni = aux.Scanf.scanDni();
+                    
+
+
                     //Funcion de registrarse
                     break;
                 case 2:

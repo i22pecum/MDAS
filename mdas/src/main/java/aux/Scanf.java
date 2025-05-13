@@ -68,6 +68,25 @@ public class Scanf{
 		
 		return result;
 	}
+
+	
+	public static String scanDni() {
+		String result = "";
+		Boolean valido = true;
+		Scanner sc=new Scanner(System.in);
+		do{
+			result=sc.nextLine();
+			valido = true;
+			result = result.toUpperCase();
+
+			if(result.matches("[0-9]{8}[A-Z]") == false) {
+				System.out.println("Error, el dni no tiene el formato correcto");
+				valido = false;
+			}
+		}while (valido == false);
+		
+		return result;
+	}
 	
 	/**
 	 * Lee una fecha desde la entrada estándar (teclado) y la devuelve como un objeto Date.
