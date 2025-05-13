@@ -1,6 +1,7 @@
 package main;
 
 import dto.*;
+import mgr.UsuarioMgr;
 /**
  * Hello world!
  *
@@ -9,8 +10,8 @@ public class App
 {
     public static void main( String[] args ){
         int opc;
+        UsuarioMgr usuarioMgr = UsuarioMgr.getInstance();
         Usuario usuario = new Usuario();
-        String dni = "";
         do{
             System.out.println("\nSelecciona la acción que desees realizar:" +
                                 "\n1.- Registrarse" +
@@ -37,9 +38,9 @@ public class App
                     System.out.println("\nIntroduce tu numero de teléfono:");
                     usuario.setTelefono(aux.Scanf.scanInt());
                     System.out.println("\nIntroduce tu DNI:");
-                    dni = aux.Scanf.scanDni();
-                    
+                    usuario.setDni(aux.Scanf.scanDni());
 
+                    usuarioMgr.Registrarse(usuario);
 
                     //Funcion de registrarse
                     break;
