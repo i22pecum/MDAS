@@ -25,4 +25,13 @@ public class UsuarioMgr {
 
         return registrado;
     }
+
+    public Boolean IniciarSesion(Usuario usuario) {
+        Boolean permitirAcceso = false;
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+
+        permitirAcceso = usuarioDAO.validarUsuario(usuario);
+
+        return permitirAcceso;
+    }
 }

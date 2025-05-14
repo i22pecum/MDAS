@@ -12,6 +12,7 @@ public class App
         int opc;
         UsuarioMgr usuarioMgr = UsuarioMgr.getInstance();
         Usuario usuario = new Usuario();
+        App.clearConsole();
         do{
             System.out.println("\nSelecciona la acción que desees realizar:" +
                                 "\n1.- Registrarse" +
@@ -21,14 +22,13 @@ public class App
             opc = aux.Scanf.scanInt();
             
             //Para hacer un clear de la terminal
-            System.out.print("\033[H\033[2J");
-            System.out.flush();
+            App.clearConsole();
 
             switch (opc) {
                 case 0:
                     System.out.println("\nSaliendo de la aplicación");
                     break;
-                case 1:
+                case 1: //Funcion de registrarse
                     System.out.println("\nIntroduce tu correo:");
                     usuario.setCorreo(aux.Scanf.scanString());
                     System.out.println("\nIntroduce tu contraseña:");
@@ -40,11 +40,33 @@ public class App
                     System.out.println("\nIntroduce tu DNI:");
                     usuario.setDni(aux.Scanf.scanDni());
 
-                    usuarioMgr.Registrarse(usuario);
+                    App.clearConsole();
+                    if(usuarioMgr.Registrarse(usuario) == true){
+                        System.out.println("\nUsuario registrado correctamente");
+                    }
+                    else{
 
-                    //Funcion de registrarse
+                        System.out.println("\nError al registrar el usuario");
+                    }
                     break;
                 case 2:
+                    System.out.println("\nIntroduce tu correo:");
+                    usuario.setCorreo(aux.Scanf.scanString());
+                    System.out.println("\nIntroduce tu contraseña:");
+                    usuario.setContrasena(aux.Scanf.scanString());
+
+                    App.clearConsole();
+                    if(usuarioMgr.IniciarSesion(usuario) == true){
+                        System.out.println("\nIniciando sesion");
+                        //Aqui se tiene que comprobar si es organizador o usuario normal
+                        //En caso de ser organizador se llama a la interfazOrganizador
+                        //En caso de ser usuario normal se llama a la interfazUsuario
+                        //Por ahora solo llamamos a la interfazUsuario
+                        interfazUsuario();
+                    } 
+                    else{
+                        System.out.println("\nError al iniciar sesion, el correo o la contraseña son incorrectos");
+                    }
                     //Funcion de iniciar sesion
                     break;
                 default:
@@ -142,5 +164,10 @@ public class App
                     break;
             }
         }while(opc != 0);
+    }
+
+    private static void clearConsole() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 }

@@ -28,7 +28,7 @@ public class SQLProperties {
 
         properties = new Properties();
         
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("resources/sql.properties")) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("sql.properties")) {
             properties.load(input);
         } catch (IOException e) {
             e.printStackTrace();
