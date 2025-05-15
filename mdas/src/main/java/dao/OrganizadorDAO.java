@@ -13,38 +13,6 @@ public class OrganizadorDAO {
     public OrganizadorDAO() {
         sqlProperties = new SQLProperties();
     }  
-    
-    public Boolean insertarOrganizador(Organizador organizador) {
-        Boolean registrado = false;
-        DBConnection dbConnection = new DBConnection();
-        PreparedStatement preparedStatement = null;
-
-        // Para encriptar la contraseña
-        String hashedPassword = BCrypt.hashpw(organizador.getContrasena(), BCrypt.gensalt());
-
-        try {
-            Connection connection = dbConnection.getConnection();
-            String sql = sqlProperties.getSQLQuery("insertar_organizador");
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, organizador.getCorreo());
-            preparedStatement.setString(2, hashedPassword);
-            preparedStatement.setString(3, organizador.getNombreCompleto());
-            preparedStatement.setString(4, organizador.getDni());
-            preparedStatement.setInt(5, organizador.getTelefono());
-
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                registrado = true;
-            }
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
-            dbConnection.closeConnection();
-        } catch (SQLException e) {
-            registrado = false;
-        } 
-        return registrado;
-    }
 
     public Boolean validarOrganizador(Organizador organizador) {
         Boolean permitirAcceso = false;
@@ -75,5 +43,28 @@ public class OrganizadorDAO {
             permitirAcceso = false;
         } 
         return permitirAcceso;
+    }
+
+    public boolean restarMonedero(String correo, float cantidad) {
+        DBConnection dbConnection = new DBConnection();
+        boolean exito = false;
+        String sql = sqlProperties.getSQLQuery("restar_monedero_organizador");
+        int filas;
+
+        try {
+            Connection conn = dbConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setDouble(1, cantidad);
+            ps.setString(2, correo);
+
+            filas = ps.executeUpdate();
+            exito = filas > 0;
+
+            ps.close();
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exito;
     }
 }

@@ -27,9 +27,7 @@ public class EventoDAO {
             preparedStatement.setString(2, evento.getDescripcion());
             preparedStatement.setString(3, evento.getLugar());
             preparedStatement.setDate(4, evento.getFecha());
-            preparedStatement.setFloat(5, evento.getPrecio());
-            preparedStatement.setInt(6, evento.getAforo());
-            preparedStatement.setString(7, evento.getCorreoOrganizador());
+            preparedStatement.setString(5, evento.getCorreoOrganizador());
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -47,7 +45,7 @@ public class EventoDAO {
         return publicado;
     }
 
-    public Boolean cancelarEvento(String nombreEvento, String correoOrganizador) {
+    public Boolean cancelarEvento(String nombreEvento) {
         Boolean cancelado = false;
         DBConnection dbConnection = new DBConnection();
         PreparedStatement preparedStatement = null;
@@ -57,7 +55,6 @@ public class EventoDAO {
             String sql = sqlProperties.getSQLQuery("cancelar_evento");
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, nombreEvento);
-            preparedStatement.setString(2, correoOrganizador);
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {

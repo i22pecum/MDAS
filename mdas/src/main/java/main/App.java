@@ -87,14 +87,14 @@ public class App
                         System.out.println("\nIntroduce tu contraseña:");
                         organizador.setContrasena(aux.Scanf.scanString());
     
-                    App.clearConsole();
-                    if (usuarioMgr.IniciarSesionOrganizador(organizador) == true){
-                        System.out.println("\nIniciando sesion como Organizador");
-                        interfazOrganizador(organizador.getCorreo());
-                    }
-                    else{
-                        System.out.println("Credenciales incorrectas.");
-                    }
+                        App.clearConsole();
+                        if (usuarioMgr.IniciarSesionOrganizador(organizador) == true){
+                            System.out.println("\nIniciando sesion como Organizador");
+                            interfazOrganizador(organizador.getCorreo());
+                        }
+                        else{
+                            System.out.println("Credenciales incorrectas.");
+                        }
                     break;
                 case 2:
                         //Inicio como usuario
@@ -103,10 +103,10 @@ public class App
                         System.out.println("\nIntroduce tu contraseña:");
                         usuario.setContrasena(aux.Scanf.scanString());
     
-                    App.clearConsole();
-                    if(usuarioMgr.IniciarSesionUsuario(usuario) == true){
-                        System.out.println("\nIniciando sesion como Usuario");
-                        interfazUsuario(usuario.getCorreo());
+                        App.clearConsole();
+                        if(usuarioMgr.IniciarSesionUsuario(usuario) == true){
+                            System.out.println("\nIniciando sesion como Usuario");
+                            interfazUsuario(usuario.getCorreo());
                         } 
                         else{
                             System.out.println("\nError al iniciar sesion, el correo o la contraseña son incorrectos");
@@ -196,7 +196,7 @@ public class App
                     //Funcion de publicar reventa
                     
                     break;
-                case 3:
+                case 3: //Termiando
                     //Funcion de recargar monedero
                     saldoActual = usuarioMgr.consultarMonedero(correoUsuario);
                     System.out.println("\nSaldo actual: " + saldoActual);
@@ -215,7 +215,7 @@ public class App
                         System.out.println("\nCantidad inválida.");
                     }
                     break;
-                case 4:
+                case 4: //Terminado
                     //Funcion de ver mis entradas
                     entradas = transaccionMgr.verEntradasUsuario(correoUsuario);
                     contador = 1;
@@ -233,11 +233,11 @@ public class App
                     }
                     
                     break;
-                case 5:
+                case 5: //Terminado
                     //Funcion de Valorar Usuario
                     System.out.println("\nLo sentimos, esta función no se ha implementado todavia");
                     break;
-                case 6:
+                case 6: //Terminado
                     //Funcion de Reclamar/Consultar
                     System.out.println("\nLo sentimos, esta función no se ha implementado todavia");
                     break;
@@ -250,8 +250,14 @@ public class App
 
     public static void interfazOrganizador(String correoOrganizador){
         int opc;
+        int contador = 0;
+        int eventoSeleccionado = 0;
         EventoMgr eventoMgr = EventoMgr.getInstance();
+        TransaccionMgr transaccionMgr = TransaccionMgr.getInstance();
         Evento evento = new Evento();
+        Entrada entrada = new Entrada();
+        ArrayList<Entrada> entradas = new ArrayList<Entrada>();
+        ArrayList<Evento> eventos = new ArrayList<Evento>();
         do{
             System.out.println("\nSelecciona la acción que desees realizar:" +
                                 "\n1.- Publicar Evento" +
@@ -283,14 +289,13 @@ public class App
                     evento.setLugar(aux.Scanf.scanString());
 
                     System.out.println("Introduce la fecha (formato yyyy-MM-dd):");
-                    String fechaStr = aux.Scanf.scanString();
-                    try {
-                        java.sql.Date fecha = java.sql.Date.valueOf(fechaStr);
-                        evento.setFecha(fecha);
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Formato de fecha inválido. Usa yyyy-MM-dd.");
-                        break;
-                    }
+                    evento.setFecha(aux.Scanf.scanFecha());
+
+                    System.out.println("Introduce el limite de reventa (0.%):");
+                    evento.setLimiteReventa(aux.Scanf.scanFloat());
+
+                    //Para crear las entradas es donde podriamos usar el patron de diseño Factory
+                    
 
                     boolean publicado = eventoMgr.publicarEvento(evento);
 
@@ -314,14 +319,7 @@ public class App
                     evento.setLugar(aux.Scanf.scanString());
 
                     System.out.println("Introduce la nueva fecha (formato yyyy-MM-dd):");
-                    fechaStr = aux.Scanf.scanString();
-                    try {
-                        java.sql.Date fecha = java.sql.Date.valueOf(fechaStr);
-                        evento.setFecha(fecha);
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Formato de fecha inválido. Usa yyyy-MM-dd.");
-                        break;
-                    }
+                    evento.setFecha(aux.Scanf.scanFecha());
 
                     boolean modificado = eventoMgr.modificarEvento(evento);
 
@@ -332,12 +330,31 @@ public class App
                     }
                     
                     break;
-                case 3:
+                case 3: //Terminado
                     //Funcion de cancelar evento
-                    System.out.println("Introduce el nombre del evento que deseas cancelar:");
-                    String nombreEvento = aux.Scanf.scanString();
+                    System.out.println("Selecciona el evento que deseas cancelar:");
+                    eventos = eventoMgr.verEventosOrganizador(correoOrganizador);
 
-                    boolean cancelado = eventoMgr.cancelarEvento(nombreEvento, correoOrganizador);
+                    contador = 1;
+
+                    if(eventos.isEmpty()){
+                        System.out.println("\nNo tienes eventos publicados");
+                        break;
+                    }
+
+                    for(Evento eventoDisponible : eventos){
+                        System.out.println("\n" + contador + ".- " + eventoDisponible.getNombre());
+                        contador++;
+                    }
+                    eventoSeleccionado = aux.Scanf.scanInt() - 1;
+
+                    transaccionMgr.devolverDinero(eventos.get(eventoSeleccionado).getNombre());
+
+                    transaccionMgr.eliminarTransacciones(eventos.get(eventoSeleccionado).getNombre());
+
+                    transaccionMgr.eliminarEntradas(eventos.get(eventoSeleccionado).getNombre());
+
+                    boolean cancelado = eventoMgr.cancelarEvento(eventos.get(eventoSeleccionado).getNombre());
 
                     if (cancelado) {
                         System.out.println("\nEvento cancelado correctamente.");

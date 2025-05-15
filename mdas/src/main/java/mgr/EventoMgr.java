@@ -22,9 +22,9 @@ public class EventoMgr {
         return eventoDAO.insertarEvento(evento);
     }
 
-    public Boolean cancelarEvento(String nombreEvento, String correoOrganizador) {
+    public Boolean cancelarEvento(String nombreEvento) {
         EventoDAO eventoDAO = new EventoDAO();
-        return eventoDAO.cancelarEvento(nombreEvento, correoOrganizador);
+        return eventoDAO.cancelarEvento(nombreEvento);
     }
 
     public Boolean modificarEvento(Evento evento) {

@@ -3,6 +3,7 @@
 /home/usuario/MDAS/mdas/src/main/java/dao/UsuarioDAO.java
 /home/usuario/MDAS/mdas/src/main/java/aux/SQLProperties.java
 /home/usuario/MDAS/mdas/src/main/java/mgr/Reclamacion_ConsultaMgr.java
+/home/usuario/MDAS/mdas/src/main/java/dao/EventoDAO.java
 /home/usuario/MDAS/mdas/src/main/java/dto/Usuario.java
 /home/usuario/MDAS/mdas/src/main/java/dto/Entrada.java
 /home/usuario/MDAS/mdas/src/main/java/mgr/UsuarioMgr.java
@@ -10,5 +11,9 @@
 /home/usuario/MDAS/mdas/src/main/java/dto/Organizador.java
 /home/usuario/MDAS/mdas/src/main/java/dto/Evento.java
 /home/usuario/MDAS/mdas/src/main/java/aux/DBConnection.java
+/home/usuario/MDAS/mdas/src/main/java/dao/OrganizadorDAO.java
+/home/usuario/MDAS/mdas/src/main/java/mgr/OrganizadorMgr.java
+/home/usuario/MDAS/mdas/src/main/java/dto/TipoEntrada.java
 /home/usuario/MDAS/mdas/src/main/java/mgr/EventoMgr.java
+/home/usuario/MDAS/mdas/src/main/java/dao/EntradaDAO.java
 /home/usuario/MDAS/mdas/src/main/java/mgr/TransaccionMgr.java

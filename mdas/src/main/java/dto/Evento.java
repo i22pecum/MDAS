@@ -7,19 +7,17 @@ public class Evento {
     private String descripcion;
     private String lugar;
     private Date fecha;
-    private float precio;
-    private int aforo;
+    private float limiteReventa;
     private String correoOrganizador;
 
     public Evento() {}
 
-    public Evento(String nombre, String descripcion, String lugar, Date fecha, float precio, int aforo, String correoOrganizador) {
+    public Evento(String nombre, String descripcion, String lugar, Date fecha, float limiteReventa, String correoOrganizador) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.lugar = lugar;
         this.fecha = fecha;
-        this.precio = precio;
-        this.aforo = aforo;
+        this.limiteReventa = limiteReventa;
         this.correoOrganizador = correoOrganizador;
     }
 
@@ -55,20 +53,12 @@ public class Evento {
         this.fecha = fecha;
     }
 
-    public float getPrecio() {
-        return precio;
+    public float getLimiteReventa() {
+        return limiteReventa;
     }
 
-    public void setPrecio(float precio) {
-        this.precio = precio;
-    }
-
-    public int getAforo() {
-        return aforo;
-    }
-
-    public void setAforo(int aforo) {
-        this.aforo = aforo;
+    public void setLimiteReventa(float limiteReventa) {
+        this.limiteReventa = limiteReventa;
     }
 
     public String getCorreoOrganizador() {

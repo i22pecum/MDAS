@@ -4,13 +4,21 @@ import dto.Entrada;
 import dto.TipoEntrada;
 import java.util.ArrayList;
 import aux.DBConnection;
+import aux.SQLProperties;
+
 import java.sql.*;
 
 public class EntradaDAO {
+
+    private SQLProperties sqlProperties;
+
+    public EntradaDAO() {
+        sqlProperties = new SQLProperties();
+    }  
     
-    public ArrayList<Integer> getEntradasByCorreo(String correo) {
+    public ArrayList<Integer> getIdEntradasByCorreo(String correo) {
         ArrayList<Integer> entradas = new ArrayList<>();
-        String sql = "ver_entradas";
+        String sql = sqlProperties.getSQLQuery("ver_entradas_correo");
         DBConnection dbConnection = new DBConnection();
         
         try {
@@ -31,9 +39,32 @@ public class EntradaDAO {
         return entradas;
     }
 
+    public ArrayList<Integer> getIdEntradasByEvento(String nombreEvento) {
+        ArrayList<Integer> entradas = new ArrayList<>();
+        String sql = sqlProperties.getSQLQuery("ver_entradas_evento");
+        DBConnection dbConnection = new DBConnection();
+        
+        try {
+            Connection connection = dbConnection.getConnection();
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            
+            pstmt.setString(1, nombreEvento);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Integer idEntrada = rs.getInt("idEntrada");
+                entradas.add(idEntrada);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return entradas;
+    }
+
     public ArrayList<Entrada> getEntradasById(ArrayList<Integer> idEntradas) {
         ArrayList<Entrada> entradas = new ArrayList<>();
-        String sql = "ver_entrada";
+        String sql = sqlProperties.getSQLQuery("ver_entrada");
         DBConnection dbConnection = new DBConnection();
         
         try {
@@ -56,6 +87,57 @@ public class EntradaDAO {
             e.printStackTrace();
         }
         return entradas;
+    }
+
+    public Boolean eliminarEntradasVendidasByIdEntrada(ArrayList<Integer> idEntradas) {
+        Boolean eliminado = false;
+        String sql = sqlProperties.getSQLQuery("eliminar_entradas_vendidas");
+        DBConnection dbConnection = new DBConnection();
+        
+        try {
+            Connection connection = dbConnection.getConnection();
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            
+            for (Integer id : idEntradas) {
+                pstmt.setInt(1, id);
+                pstmt.executeUpdate();
+            }
+            eliminado = true;
+            if (pstmt != null) {
+                pstmt.close();
+            }
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+        
+        return eliminado;
+    }
+
+    public Boolean eliminarEntradasByNombreEvento(String nombreEvento) {
+        Boolean eliminado = false;
+        String sql = sqlProperties.getSQLQuery("eliminar_entradas_evento");
+        DBConnection dbConnection = new DBConnection();
+        
+        try {
+            Connection connection = dbConnection.getConnection();
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            
+            pstmt.setString(1, nombreEvento);
+            pstmt.executeUpdate();
+            
+            eliminado = true;
+            if (pstmt != null) {
+                pstmt.close();
+            }
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+        
+        return eliminado;
     }
 
     public boolean comprarEntrada(String correoUsuario, int idEntrada) {

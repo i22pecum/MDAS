@@ -2,7 +2,7 @@ package aux;
 
 import java.util.Scanner;		
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.Date;
 
 
 /**
@@ -36,9 +36,9 @@ public class Scanf{
 	 */
 	public static String scanString() {
 		String result;
-		Scanner sc=new Scanner(System.in);
+		Scanner sc = new Scanner(System.in);
 		
-		result=sc.nextLine();
+		result = sc.nextLine();
 		
 		return result;
 	}
@@ -53,36 +53,36 @@ public class Scanf{
 	 * @return El número entero ingresado por el usuario.
 	 */
 	public static int scanInt() {
-		int result=0, aux=0;
-		Scanner sc=new Scanner(System.in);
+		int result = 0, aux = 0;
+		Scanner sc = new Scanner(System.in);
 		do {
 			try {
-				result=sc.nextInt();
-				aux=1;
+				result = sc.nextInt();
+				aux = 1;
 			}
 			catch(Exception e) {
 				System.out.println("Error, no se ha introducido un numero entero, vuelva a introducir el valor");
 				sc.nextLine();
 			}
-		}while(aux==0);
+		}while(aux == 0);
 		
 		return result;
 	}
 
 	public static float scanFloat() {
-		float result=0; 
-		int aux=0;
-		Scanner sc=new Scanner(System.in);
+		float result = 0; 
+		int aux = 0;
+		Scanner sc = new Scanner(System.in);
 		do {
 			try {
-				result=sc.nextFloat();
-				aux=1;
+				result = sc.nextFloat();
+				aux = 1;
 			}
 			catch(Exception e) {
 				System.out.println("Error, no se ha introducido un numero entero, vuelva a introducir el valor");
 				sc.nextLine();
 			}
-		}while(aux==0);
+		}while(aux == 0);
 		
 		return result;
 	}
@@ -91,9 +91,9 @@ public class Scanf{
 	public static String scanDni() {
 		String result = "";
 		Boolean valido = true;
-		Scanner sc=new Scanner(System.in);
+		Scanner sc = new Scanner(System.in);
 		do{
-			result=sc.nextLine();
+			result = sc.nextLine();
 			valido = true;
 			result = result.toUpperCase();
 
@@ -106,59 +106,25 @@ public class Scanf{
 		return result;
 	}
 	
-	/**
-	 * Lee una fecha desde la entrada estándar (teclado) y la devuelve como un objeto Date.
-	 * 
-	 * Este método solicita al usuario que ingrese una fecha en formato "dd/MM/yyyy". Si el usuario 
-	 * ingresa un formato incorrecto, el método captura la excepción y solicita al usuario que vuelva 
-	 * a ingresar una fecha válida en el formato correcto.
-	 * 
-	 * @return La fecha ingresada por el usuario como un objeto Date.
-	 */
 	public static Date scanFecha() {
-		int aux=0;
-		Date result=new Date();
-		SimpleDateFormat sdf= new SimpleDateFormat("dd/MM/yyyy");
-		Scanner sc=new Scanner(System.in);
+		int aux = 0;
+		String fecha = "";
+		Date result = null;
+		Scanner sc = new Scanner(System.in);
 		do {
 			try {
-				result=sdf.parse(sc.nextLine());
-				aux=1;
+				fecha = sc.nextLine();
+				result = Date.valueOf(fecha);
+				aux = 1;
 			}
 			catch(Exception e) {
 				System.out.println("Error, formato de fecha incorrecto, vuelva a introducir la fecha");
 			}
-		}while(aux==0);
+		}while(aux == 0);
 		
 		return result;
 	}
-	
-	/**
-	 * Lee una fecha y hora desde la entrada estándar (teclado) y la devuelve como un objeto Date.
-	 * 
-	 * Este método solicita al usuario que ingrese una fecha y hora en el formato "dd/MM/yyyy HH:mm".
-	 * Si el usuario ingresa un formato incorrecto, el método captura la excepción y solicita al usuario 
-	 * que vuelva a ingresar la fecha y hora correctamente.
-	 * 
-	 * @return La fecha y hora ingresadas por el usuario como un objeto Date.
-	 */
-	public static Date scanFechaHora() {
-		int aux=0;
-		Date result=new Date();
-		SimpleDateFormat sdf= new SimpleDateFormat("dd/MM/yyyy HH:mm");
-		Scanner sc=new Scanner(System.in);
-		do {
-			try {
-				result=sdf.parse(sc.nextLine());
-				aux=1;
-			}
-			catch(Exception e) {
-				System.out.println("Error, formato de fecha incorrecto, vuelva a introducir la fecha");
-			}
-		}while(aux==0);
-		
-		return result;
-	}
+
 	
 	/**
 	 * Lee una entrada del usuario para determinar si el tipo es "Exterior" o "Interior".

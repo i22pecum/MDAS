@@ -45,7 +45,8 @@ public class UsuarioMgr {
 
         return permitirAcceso;
     }
-     public float consultarMonedero(String correo) {
+    
+    public float consultarMonedero(String correo) {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         return usuarioDAO.consultarMonedero(correo);
     }

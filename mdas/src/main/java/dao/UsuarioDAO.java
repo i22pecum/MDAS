@@ -81,12 +81,34 @@ public class UsuarioDAO {
     public boolean recargarMonedero(String correo, float cantidad) {
         DBConnection dbConnection = new DBConnection();
         boolean exito = false;
-        String sql;
+        String sql = sqlProperties.getSQLQuery("recargar_monedero");
         int filas;
 
         try {
             Connection conn = dbConnection.getConnection();
-            sql = "UPDATE usuarios SET monedero = monedero + ? WHERE correo = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setDouble(1, cantidad);
+            ps.setString(2, correo);
+
+            filas = ps.executeUpdate();
+            exito = filas > 0;
+
+            ps.close();
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exito;
+    }
+
+    public boolean restarMonedero(String correo, float cantidad) {
+        DBConnection dbConnection = new DBConnection();
+        boolean exito = false;
+        String sql = sqlProperties.getSQLQuery("restar_monedero_usuario");
+        int filas;
+
+        try {
+            Connection conn = dbConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setDouble(1, cantidad);
             ps.setString(2, correo);
