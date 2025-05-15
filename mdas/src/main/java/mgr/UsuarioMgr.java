@@ -1,6 +1,8 @@
 package mgr;
 
+import dto.Organizador;
 import dto.Usuario;
+import dao.OrganizadorDAO;
 import dao.UsuarioDAO;
 
 public class UsuarioMgr {
@@ -26,12 +28,30 @@ public class UsuarioMgr {
         return registrado;
     }
 
-    public Boolean IniciarSesion(Usuario usuario) {
+    public Boolean IniciarSesionUsuario(Usuario usuario) {
         Boolean permitirAcceso = false;
         UsuarioDAO usuarioDAO = new UsuarioDAO();
 
         permitirAcceso = usuarioDAO.validarUsuario(usuario);
 
         return permitirAcceso;
+    }
+
+    public Boolean IniciarSesionOrganizador(Organizador organizador) {
+        Boolean permitirAcceso = false;
+        OrganizadorDAO OrganizadorDAO = new OrganizadorDAO();
+
+        permitirAcceso = OrganizadorDAO.validarOrganizador(organizador);
+
+        return permitirAcceso;
+    }
+     public float consultarMonedero(String correo) {
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        return usuarioDAO.consultarMonedero(correo);
+    }
+
+    public boolean recargarMonedero(String correo, float cantidad){
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        return usuarioDAO.recargarMonedero(correo, cantidad);
     }
 }

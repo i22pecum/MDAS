@@ -17,6 +17,146 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `entradas`
+--
+
+DROP TABLE IF EXISTS `entradas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `entradas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tipo` enum('GENERAL','VIP','NUMERADA') NOT NULL,
+  `tipoVenta` enum('VENTAPRIMARIA','VENTASECUNDARIA') NOT NULL,
+  `disponibles` int(11) NOT NULL,
+  `precio` float NOT NULL,
+  `evento` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `evento` (`evento`),
+  CONSTRAINT `entradas_ibfk_1` FOREIGN KEY (`evento`) REFERENCES `eventos` (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `entradas`
+--
+
+LOCK TABLES `entradas` WRITE;
+/*!40000 ALTER TABLE `entradas` DISABLE KEYS */;
+/*!40000 ALTER TABLE `entradas` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `entradasVendidas`
+--
+
+DROP TABLE IF EXISTS `entradasVendidas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `entradasVendidas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `idEntrada` int(11) NOT NULL,
+  `correoUsuario` varchar(150) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idEntrada` (`idEntrada`),
+  KEY `correoUsuario` (`correoUsuario`),
+  CONSTRAINT `entradasVendidas_ibfk_1` FOREIGN KEY (`idEntrada`) REFERENCES `entradas` (`id`),
+  CONSTRAINT `entradasVendidas_ibfk_2` FOREIGN KEY (`correoUsuario`) REFERENCES `usuarios` (`correo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `entradasVendidas`
+--
+
+LOCK TABLES `entradasVendidas` WRITE;
+/*!40000 ALTER TABLE `entradasVendidas` DISABLE KEYS */;
+/*!40000 ALTER TABLE `entradasVendidas` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `eventos`
+--
+
+DROP TABLE IF EXISTS `eventos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `eventos` (
+  `nombre` varchar(255) NOT NULL,
+  `descripcion` varchar(1000) NOT NULL,
+  `ubicacion` varchar(255) NOT NULL,
+  `fecha` date NOT NULL,
+  `limiteReventa` float NOT NULL,
+  `correoOrganizador` varchar(150) NOT NULL,
+  PRIMARY KEY (`nombre`),
+  KEY `correoOrganizador` (`correoOrganizador`),
+  CONSTRAINT `eventos_ibfk_1` FOREIGN KEY (`correoOrganizador`) REFERENCES `organizadores` (`correo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `eventos`
+--
+
+LOCK TABLES `eventos` WRITE;
+/*!40000 ALTER TABLE `eventos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `eventos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `organizadores`
+--
+
+DROP TABLE IF EXISTS `organizadores`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `organizadores` (
+  `correo` varchar(150) NOT NULL,
+  `contrasena` varchar(255) NOT NULL,
+  `descripcion` varchar(1000) NOT NULL,
+  `monedero` float DEFAULT 0,
+  PRIMARY KEY (`correo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `organizadores`
+--
+
+LOCK TABLES `organizadores` WRITE;
+/*!40000 ALTER TABLE `organizadores` DISABLE KEYS */;
+INSERT INTO `organizadores` VALUES
+('organizador@gmail.com','$2a$10$Tdzno1MvLb5wCtI/wem1VuuoNvZxLloe38dFOVuIZdyKKsA.AiBh6','Ejemplo',0);
+/*!40000 ALTER TABLE `organizadores` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transacciones`
+--
+
+DROP TABLE IF EXISTS `transacciones`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transacciones` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tipo` enum('VENTAPRIMARIA','VENTASECUNDARIA') NOT NULL,
+  `importe` float NOT NULL,
+  `fecha` date NOT NULL,
+  `comprador` varchar(150) NOT NULL,
+  `vendedor` varchar(150) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transacciones`
+--
+
+LOCK TABLES `transacciones` WRITE;
+/*!40000 ALTER TABLE `transacciones` DISABLE KEYS */;
+/*!40000 ALTER TABLE `transacciones` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `usuarios`
 --
 
@@ -29,7 +169,9 @@ CREATE TABLE `usuarios` (
   `contrasena` varchar(255) NOT NULL,
   `telefono` int(11) NOT NULL,
   `dni` varchar(255) NOT NULL,
-  PRIMARY KEY (`correo`)
+  `monedero` float DEFAULT 0,
+  PRIMARY KEY (`correo`),
+  UNIQUE KEY `dni` (`dni`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -40,7 +182,7 @@ CREATE TABLE `usuarios` (
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
 INSERT INTO `usuarios` VALUES
-('i22pecum@uco.es','Manuel Peinado','$2a$10$/S/QCd2EO1mlAKIPYpRw.uz28SP6gQn972tUUa/Y7kmCexB4M/6J6',626394400,'31880419G');
+('i22pecum@uco.es','Manuel Peinado','$2a$10$Tdzno1MvLb5wCtI/wem1VuuoNvZxLloe38dFOVuIZdyKKsA.AiBh6',626394400,'31880419G',35);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +195,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-14 11:34:31
+-- Dump completed on 2025-05-15 13:57:23

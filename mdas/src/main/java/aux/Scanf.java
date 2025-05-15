@@ -69,6 +69,24 @@ public class Scanf{
 		return result;
 	}
 
+	public static float scanFloat() {
+		float result=0; 
+		int aux=0;
+		Scanner sc=new Scanner(System.in);
+		do {
+			try {
+				result=sc.nextFloat();
+				aux=1;
+			}
+			catch(Exception e) {
+				System.out.println("Error, no se ha introducido un numero entero, vuelva a introducir el valor");
+				sc.nextLine();
+			}
+		}while(aux==0);
+		
+		return result;
+	}
+
 	
 	public static String scanDni() {
 		String result = "";

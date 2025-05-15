@@ -6,13 +6,16 @@ public class Usuario {
     String nombreCompleto;
     String dni;
     int telefono;
+    float monedero;
 
-    public Usuario(String correo, String contrasena, String nombreCompleto, String dni, int telefono) {
+
+    public Usuario(String correo, String contrasena, String nombreCompleto, String dni, int telefono, float monedero) {
         this.correo = correo;
         this.contrasena = contrasena;
         this.nombreCompleto = nombreCompleto;
         this.dni = dni;
         this.telefono = telefono;
+        this.monedero = monedero;
     }
 
     public Usuario() {}
@@ -56,5 +59,11 @@ public class Usuario {
     public void setTelefono(int telefono) {
         this.telefono = telefono;
     }
+    public float getMonedero() {
+    return monedero;
+}
 
+    public void setMonedero(float monedero) {
+        this.monedero = monedero;
+    }
 }

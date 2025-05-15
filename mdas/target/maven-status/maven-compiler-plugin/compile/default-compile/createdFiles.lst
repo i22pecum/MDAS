@@ -1,14 +1,8 @@
-main/App.class
 dto/Transaccion.class
 dto/Evento.class
 mgr/Reclamacion_ConsultaMgr.class
 dto/Usuario.class
-mgr/TransaccionMgr.class
 aux/Scanf.class
 dao/UsuarioDAO.class
-dto/Organizador.class
-aux/DBConnection.class
-mgr/UsuarioMgr.class
-mgr/EventoMgr.class
 aux/SQLProperties.class
 dto/Entrada.class

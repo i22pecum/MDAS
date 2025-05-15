@@ -30,6 +30,8 @@ public class UsuarioDAO {
             preparedStatement.setString(3, usuario.getNombreCompleto());
             preparedStatement.setString(4, usuario.getDni());
             preparedStatement.setInt(5, usuario.getTelefono());
+            preparedStatement.setFloat(6, usuario.getMonedero());
+            
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -75,5 +77,56 @@ public class UsuarioDAO {
         } 
         return permitirAcceso;
     }
+
+    public boolean recargarMonedero(String correo, float cantidad) {
+        DBConnection dbConnection = new DBConnection();
+        boolean exito = false;
+        String sql;
+        int filas;
+
+        try {
+            Connection conn = dbConnection.getConnection();
+            sql = "UPDATE usuarios SET monedero = monedero + ? WHERE correo = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setDouble(1, cantidad);
+            ps.setString(2, correo);
+
+            filas = ps.executeUpdate();
+            exito = filas > 0;
+
+            ps.close();
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exito;
+    }
+
+    public float consultarMonedero(String correo) {
+    DBConnection dbConnection = new DBConnection();
+    float saldo = 0.0f;
+    String sql;
+
+    try {
+        Connection conn = dbConnection.getConnection();
+        sql = "SELECT monedero FROM usuarios WHERE correo = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, correo);
+
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            saldo = rs.getFloat("monedero");
+        }
+
+        rs.close();
+        ps.close();
+        dbConnection.closeConnection();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+        return saldo;
+    }
+
 
 }
