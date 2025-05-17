@@ -1,14 +1,18 @@
 package mgr;
 
 import java.util.ArrayList;
+
+import dto.Entrada;
 import dto.Evento;
 import dao.EventoDAO;
+import dao.EntradaDAO;
 
 public class EventoMgr {
-    
+
     private static EventoMgr instance;
 
-    private EventoMgr() {}
+    private EventoMgr() {
+    }
 
     public static EventoMgr getInstance() {
         if (instance == null) {
@@ -17,9 +21,17 @@ public class EventoMgr {
         return instance;
     }
 
-    public Boolean publicarEvento(Evento evento) {
+    public Boolean publicarEvento(Evento evento, ArrayList<Entrada> entradas) {
         EventoDAO eventoDAO = new EventoDAO();
-        return eventoDAO.insertarEvento(evento);
+        EntradaDAO entradaDAO = new EntradaDAO();
+        Boolean publicado = false;
+
+        publicado = eventoDAO.insertarEvento(evento);
+        for (Entrada entrada : entradas) {
+            publicado = entradaDAO.insertarEntrada(entrada);
+        }
+
+        return publicado;
     }
 
     public Boolean cancelarEvento(String nombreEvento) {
@@ -41,4 +53,10 @@ public class EventoMgr {
         EventoDAO eventoDAO = new EventoDAO();
         return eventoDAO.verEventosOrganizador(correo);
     }
+
+    public ArrayList<Evento> listarEventosComprar() {
+        EventoDAO eventoDAO = new EventoDAO();
+        return eventoDAO.listarEventosComprar();
+    }
+
 }

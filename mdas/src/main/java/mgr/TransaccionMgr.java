@@ -1,30 +1,22 @@
 package mgr;
 
 import java.util.ArrayList;
-import dto.Entrada;
-import dao.EntradaDAO;
-import dao.EventoDAO;
-import dao.TransaccionDAO;
-import dao.UsuarioDAO;
-import dto.Evento;
-import dto.Organizador;
-import dto.TipoTransaccion;
-import dto.Transaccion;
-import dao.OrganizadorDAO;
+import dao.*;
+import dto.*;
 
 public class TransaccionMgr {
-    
+
     private static TransaccionMgr instance;
 
+    private TransaccionMgr() {
+    }
 
-    private TransaccionMgr() {}
-
-	public static TransaccionMgr getInstance() {
-		if(instance == null) {
-			instance = new TransaccionMgr();
-		}
-		return instance;
-	}
+    public static TransaccionMgr getInstance() {
+        if (instance == null) {
+            instance = new TransaccionMgr();
+        }
+        return instance;
+    }
 
     public ArrayList<Entrada> verEntradasUsuario(String correo) {
         ArrayList<Entrada> entradas = new ArrayList<>();
@@ -45,7 +37,7 @@ public class TransaccionMgr {
         }
 
         for (Entrada entrada : entradas) {
-            if(nombreEventos.contains(entrada.getNombreEvento()) == false){
+            if (nombreEventos.contains(entrada.getNombreEvento()) == false) {
                 entradas.remove(entrada);
             }
         }
@@ -53,7 +45,7 @@ public class TransaccionMgr {
         return entradas;
     }
 
-    public void devolverDinero(String nombreEvento){
+    public void devolverDinero(String nombreEvento) {
         TransaccionDAO transaccionDAO = new TransaccionDAO();
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         OrganizadorDAO organizadorDAO = new OrganizadorDAO();
@@ -61,23 +53,22 @@ public class TransaccionMgr {
 
         transacciones = transaccionDAO.getTransaccionesByNombreEvento(nombreEvento);
 
-        for (Transaccion transaccion : transacciones){
+        for (Transaccion transaccion : transacciones) {
             usuarioDAO.recargarMonedero(transaccion.getCorreoComprador(), transaccion.getPrecio());
-            if(transaccion.getTipo().equals(TipoTransaccion.VENTASECUNDARIA) == true){
+            if (transaccion.getTipo().equals(TipoTransaccion.VENTASECUNDARIA) == true) {
                 usuarioDAO.restarMonedero(transaccion.getCorreoVendedor(), transaccion.getPrecio());
-            }
-            else{
+            } else {
                 organizadorDAO.restarMonedero(transaccion.getCorreoVendedor(), transaccion.getPrecio());
             }
         }
     }
 
-    public Boolean eliminarTransacciones(String nombreEvento){
+    public Boolean eliminarTransacciones(String nombreEvento) {
         TransaccionDAO transaccionDAO = new TransaccionDAO();
         return transaccionDAO.eliminarTransaccionesByNombreEvento(nombreEvento);
     }
 
-    public Boolean eliminarEntradas(String nombreEvento){
+    public Boolean eliminarEntradas(String nombreEvento) {
         EntradaDAO entradaDAO = new EntradaDAO();
         ArrayList<Integer> idEntradas = new ArrayList<>();
 
@@ -89,4 +80,27 @@ public class TransaccionMgr {
 
         return true;
     }
+
+    public boolean publicarReventa(Entrada entradaReventa) {
+        EntradaDAO entradaDAO = new EntradaDAO();
+        return entradaDAO.insertarReventa(entradaReventa);
+    }
+
+    public ArrayList<Entrada> verEntradasPorEvento(String nombreEvento) {
+        EntradaDAO entradaDAO = new EntradaDAO();
+        return entradaDAO.getEntradasByNombreEvento(nombreEvento);
+    }
+
+    public boolean comprarEntrada(String correoUsuario, String nombreEvento, TipoEntrada tipoEntrada) {
+        EntradaDAO entradaDAO = new EntradaDAO();
+
+        // Directamente llamar al método comprarEntrada del DAO con los datos necesarios
+        return entradaDAO.comprarEntrada(correoUsuario, nombreEvento, tipoEntrada);
+    }
+
+    public float getLimiteReventaEvento(String nombreEvento) {
+        EventoDAO eventoDAO = new EventoDAO();
+        return eventoDAO.consultarLimiteReventa(nombreEvento);
+    }
+
 }

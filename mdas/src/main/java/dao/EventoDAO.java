@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class EventoDAO {
-    
+
     private SQLProperties sqlProperties;
 
     public EventoDAO() {
@@ -27,7 +27,8 @@ public class EventoDAO {
             preparedStatement.setString(2, evento.getDescripcion());
             preparedStatement.setString(3, evento.getLugar());
             preparedStatement.setDate(4, evento.getFecha());
-            preparedStatement.setString(5, evento.getCorreoOrganizador());
+            preparedStatement.setFloat(5, evento.getLimiteReventa());
+            preparedStatement.setString(6, evento.getCorreoOrganizador());
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -84,8 +85,8 @@ public class EventoDAO {
             preparedStatement.setString(1, evento.getDescripcion());
             preparedStatement.setString(2, evento.getLugar());
             preparedStatement.setDate(3, evento.getFecha());
-            preparedStatement.setString(4, evento.getNombre());
-            preparedStatement.setString(5, evento.getCorreoOrganizador());
+            preparedStatement.setFloat(4, evento.getLimiteReventa());
+            preparedStatement.setString(5, evento.getNombre());
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -97,6 +98,7 @@ public class EventoDAO {
             }
             dbConnection.closeConnection();
         } catch (SQLException e) {
+            System.out.println("Error al modificar el evento: " + e.getMessage());
             modificado = false;
         }
 
@@ -120,8 +122,9 @@ public class EventoDAO {
                 Evento evento = new Evento();
                 evento.setNombre(resultSet.getString("nombre"));
                 evento.setDescripcion(resultSet.getString("descripcion"));
-                evento.setLugar(resultSet.getString("lugar"));
+                evento.setLugar(resultSet.getString("ubicacion"));
                 evento.setFecha(resultSet.getDate("fecha"));
+                evento.setLimiteReventa(resultSet.getFloat("limiteReventa"));
                 eventos.add(evento);
             }
 
@@ -152,7 +155,7 @@ public class EventoDAO {
                 Evento evento = new Evento();
                 evento.setNombre(resultSet.getString("nombre"));
                 evento.setDescripcion(resultSet.getString("descripcion"));
-                evento.setLugar(resultSet.getString("lugar"));
+                evento.setLugar(resultSet.getString("ubicacion"));
                 evento.setFecha(resultSet.getDate("fecha"));
                 eventos.add(evento);
             }
@@ -168,5 +171,74 @@ public class EventoDAO {
         return eventos;
     }
 
+    public float consultarLimiteReventa(String nombreEventoAsociado) {
+        float limite = 0.1f;
+        DBConnection dbConnection = new DBConnection();
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        Connection connection = null;
+
+        try {
+            connection = dbConnection.getConnection();
+            String sql = sqlProperties.getSQLQuery("consultar_limite_reventa");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, nombreEventoAsociado);
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                limite = resultSet.getFloat("limite_reventa");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al consultar el límite de reventa: " + e.getMessage());
+        } finally {
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("Error al cerrar recursos: " + e.getMessage());
+            }
+        }
+
+        return limite;
+    }
+
+    public ArrayList<Evento> listarEventosComprar() {
+        ArrayList<Evento> eventos = new ArrayList<>();
+        DBConnection dbConnection = new DBConnection();
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            Connection connection = dbConnection.getConnection();
+            String sql = sqlProperties.getSQLQuery("listar_eventos_comprar");
+            preparedStatement = connection.prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Evento evento = new Evento();
+                evento.setNombre(resultSet.getString("nombre"));
+                evento.setDescripcion(resultSet.getString("descripcion"));
+                evento.setLugar(resultSet.getString("ubicacion"));
+                evento.setFecha(resultSet.getDate("fecha"));
+                eventos.add(evento);
+            }
+
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            System.out.println("Error al listar eventos: " + e.getMessage());
+        }
+
+        return eventos;
+    }
 
 }

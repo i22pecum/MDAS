@@ -6,14 +6,16 @@
 /home/usuario/MDAS/mdas/src/main/java/dao/EventoDAO.java
 /home/usuario/MDAS/mdas/src/main/java/dto/Usuario.java
 /home/usuario/MDAS/mdas/src/main/java/dto/Entrada.java
+/home/usuario/MDAS/mdas/src/main/java/dto/TipoTransaccion.java
 /home/usuario/MDAS/mdas/src/main/java/mgr/UsuarioMgr.java
 /home/usuario/MDAS/mdas/src/main/java/main/App.java
 /home/usuario/MDAS/mdas/src/main/java/dto/Organizador.java
 /home/usuario/MDAS/mdas/src/main/java/dto/Evento.java
 /home/usuario/MDAS/mdas/src/main/java/aux/DBConnection.java
 /home/usuario/MDAS/mdas/src/main/java/dao/OrganizadorDAO.java
-/home/usuario/MDAS/mdas/src/main/java/mgr/OrganizadorMgr.java
+/home/usuario/MDAS/mdas/src/main/java/dto/EntradaFactory.java
 /home/usuario/MDAS/mdas/src/main/java/dto/TipoEntrada.java
+/home/usuario/MDAS/mdas/src/main/java/dao/TransaccionDAO.java
 /home/usuario/MDAS/mdas/src/main/java/mgr/EventoMgr.java
 /home/usuario/MDAS/mdas/src/main/java/dao/EntradaDAO.java
 /home/usuario/MDAS/mdas/src/main/java/mgr/TransaccionMgr.java

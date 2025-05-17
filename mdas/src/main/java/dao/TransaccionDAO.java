@@ -8,12 +8,12 @@ import java.sql.*;
 import dto.TipoTransaccion;
 
 public class TransaccionDAO {
-    
+
     private SQLProperties sqlProperties;
 
     public TransaccionDAO() {
         sqlProperties = new SQLProperties();
-    }  
+    }
 
     public ArrayList<Transaccion> getTransaccionesByNombreEvento(String nombreEvento) {
         ArrayList<Transaccion> transacciones = new ArrayList<>();
@@ -22,15 +22,15 @@ public class TransaccionDAO {
         try {
             Connection connection = dbConnection.getConnection();
             PreparedStatement pstmt = connection.prepareStatement(sql);
-            
+
             pstmt.setString(1, nombreEvento);
             ResultSet rs = pstmt.executeQuery();
-            
+
             while (rs.next()) {
                 Transaccion transaccion = new Transaccion();
-                transaccion.setCorreoComprador(rs.getString("correoComprador"));
-                transaccion.setCorreoVendedor(rs.getString("correoVendedor"));
-                transaccion.setPrecio(rs.getFloat("precio"));
+                transaccion.setCorreoComprador(rs.getString("Comprador"));
+                transaccion.setCorreoVendedor(rs.getString("Vendedor"));
+                transaccion.setPrecio(rs.getFloat("importe"));
                 transaccion.setTipo(TipoTransaccion.valueOf(rs.getString("tipo")));
                 transacciones.add(transaccion);
             }
@@ -43,12 +43,12 @@ public class TransaccionDAO {
 
     public Boolean eliminarTransaccionesByNombreEvento(String nombreEvento) {
         Boolean eliminado = false;
-        String sql = sqlProperties.getSQLQuery("eliminar_transacciones");
+        String sql = sqlProperties.getSQLQuery("eliminar_transaccion");
         DBConnection dbConnection = new DBConnection();
         try {
             Connection connection = dbConnection.getConnection();
             PreparedStatement pstmt = connection.prepareStatement(sql);
-            
+
             pstmt.setString(1, nombreEvento);
             pstmt.executeUpdate();
             eliminado = true;
