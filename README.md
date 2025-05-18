@@ -1,5 +1,9 @@
 # MDAS
 
+En esta practica se han implementado el Gestor de Entradas y el Gestor de Eventos definidos en la practica 1, además se ha implementado por completo TransaccionMgr sin embargo como este componente contenia demasiadas funciones hemos decidido separarlo en dos componentes, EventoMgr que se encarga de todas las operacios CRUD de los eventos y TransaccionMgr que se encarga de todas las operaciones sobre las entradas y las ventas de las mismas. Ademas se ha implementado parte de UsuarioMgr para hacer el registro y el inicio de sesión tanto de usuarios como de organizadores.
+
+Por último se ha realizado el patron de diseño **Factory** para la creación de los diferentes tipos de entradas.
+
 # Estructura del proyecto
 
 El proyecto esta estructurado de la siguiente forma:
