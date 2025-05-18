@@ -3,7 +3,7 @@
 # Estructura del proyecto
 
 El proyecto esta estructurado de la siguiente forma:
-
+```text
 mdas/
 ├── target/
 └── src/
@@ -15,16 +15,17 @@ mdas/
         │   ├── mgr/
         │   └── main/
         └── resources/
+```
 
 Y dentro de cada carpeta encontramos los siguientes archivos:
 
-**resources** --> Los ficheros properties donde se definen las consultas SQL y la informació para acceder a la base de datos
-**java** --> Los archivos *.java* de la aplicación
-**aux** --> Las clases con funcionalidades auxiliares al programa como son una clase para ayudar a solicitar parametros por la terminal, una clase para ayudar a hacer la conexion a la Base de datos y una clase para ayudar a leer las consultas SQL del fichero properties
-**dto**(Data Transfer Objects) --> Las clases donde se almacena la informacion traida de la base de datos
-**dao**(Data Access Objects) --> Las clases que se encargan de acceder a la base de datos
-**mgr** --> Las clases que se encargan de comunicar el main con los daos y ademas de hacer comprobaciones adicionales
-**main** --> La clase donde se define el main de la aplicacion
+- **resources** --> Los ficheros *.properties* donde se definen las consultas SQL y la informació para acceder a la base de datos
+- **java** --> Los archivos *.java* de la aplicación
+- **aux** --> Las clases con funcionalidades auxiliares al programa como son una clase para ayudar a solicitar parametros por la terminal, una clase para ayudar a hacer la conexion a la base de datos y una clase para ayudar a leer las consultas SQL del fichero *.properties*
+- **dto**(Data Transfer Objects) --> Las clases donde se almacena la informacion traida de la base de datos
+- **dao**(Data Access Objects) --> Las clases que se encargan de acceder a la base de datos
+- **mgr** --> Las clases que se encargan de comunicar el main con los daos y ademas de hacer comprobaciones adicionales
+- **main** --> La clase donde se define el main de la aplicacion
 
 # Base de datos
 Para utilizar una base de datos de MariaDB comun entre todos los miembros del grupo, se han creado varios scripts que se emplean de la siguiente forma:
