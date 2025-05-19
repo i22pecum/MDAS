@@ -1,7 +1,7 @@
 package mgr;
 
 /*
- * Esta clase debe de estar vacia porque no se van a implementar sus fuunciones
+ * Esta clase debe de estar vacia porque no se van a implementar sus funciones
  */
 public class Reclamacion_ConsultaMgr {
     

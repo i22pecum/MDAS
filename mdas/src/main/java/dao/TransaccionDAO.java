@@ -15,6 +15,12 @@ public class TransaccionDAO {
         sqlProperties = new SQLProperties();
     }
 
+
+    /**
+     * Obtiene todas las transacciones asociadas a un evento específico.
+     * @param nombreEvento Nombre del evento.
+     * @return Lista de transacciones relacionadas con el evento.
+     */
     public ArrayList<Transaccion> getTransaccionesByNombreEvento(String nombreEvento) {
         ArrayList<Transaccion> transacciones = new ArrayList<>();
         String sql = sqlProperties.getSQLQuery("ver_transacciones");
@@ -41,6 +47,11 @@ public class TransaccionDAO {
         return transacciones;
     }
 
+    /**
+     * Elimina todas las transacciones asociadas a un evento.
+     * @param nombreEvento Nombre del evento del que se eliminarán las transacciones.
+     * @return true si la operación fue exitosa, false en caso contrario.
+     */
     public Boolean eliminarTransaccionesByNombreEvento(String nombreEvento) {
         Boolean eliminado = false;
         String sql = sqlProperties.getSQLQuery("eliminar_transaccion");
@@ -61,6 +72,34 @@ public class TransaccionDAO {
         }
 
         return eliminado;
+    }
+
+    /**
+     * Inserta una nueva transacción en la base de datos.
+     * @param transaccion Objeto Transaccion que contiene los datos a insertar.
+     * @param nombreEvento Nombre del evento asociado a la transacción.
+     * @return true si se insertó correctamente, false si falló.
+     */
+    public Boolean insertarTransaccion(Transaccion transaccion, String nombreEvento) {
+        Boolean insertado = false;
+        String sql = sqlProperties.getSQLQuery("insertar_transaccion");
+        DBConnection dbConnection = new DBConnection();
+        try {
+            Connection connection = dbConnection.getConnection();
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+
+            pstmt.setString(1, transaccion.getCorreoComprador());
+            pstmt.setString(2, transaccion.getCorreoVendedor());
+            pstmt.setFloat(3, transaccion.getPrecio());
+            pstmt.setString(4, transaccion.getTipo().toString());
+            pstmt.setString(5, nombreEvento);
+            pstmt.executeUpdate();
+            insertado = true;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return insertado;
     }
 
 }

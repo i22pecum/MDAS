@@ -14,11 +14,15 @@ public class UsuarioDAO {
         sqlProperties = new SQLProperties();
     }  
     
+    /**
+     * Inserta un nuevo usuario en la base de datos con contraseña encriptada.
+     * @param usuario Objeto Usuario con la información a registrar.
+     * @return true si se insertó correctamente, false si falló.
+     */
     public Boolean insertarUsuario(Usuario usuario) {
         Boolean registrado = false;
         DBConnection dbConnection = new DBConnection();
         PreparedStatement preparedStatement = null;
-        // Para encriptar la contraseña
         String hashedPassword = BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt());
 
         try {
@@ -47,6 +51,12 @@ public class UsuarioDAO {
         return registrado;
     }
 
+
+    /**
+     * Valida las credenciales del usuario comprobando su contraseña encriptada.
+     * @param usuario Objeto Usuario con correo y contraseña ingresados.
+     * @return true si las credenciales son correctas, false si no.
+     */
     public Boolean validarUsuario(Usuario usuario) {
         Boolean permitirAcceso = false;
         DBConnection dbConnection = new DBConnection();

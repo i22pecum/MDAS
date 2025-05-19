@@ -69,6 +69,19 @@ public class Scanf{
 		return result;
 	}
 
+	public static int scanIntPositivo() {
+		int result = 0;
+		do{
+			result = scanInt();
+			if(result < 0){
+				System.out.println("Error, el numero no puede ser negativo");
+			}
+
+		} while (result < 0);
+		
+		return result;
+	}
+
 	public static float scanFloat() {
 		float result = 0; 
 		int aux = 0;
@@ -83,6 +96,31 @@ public class Scanf{
 				sc.nextLine();
 			}
 		}while(aux == 0);
+		
+		return result;
+	}
+
+	public static float scanFloatPositivo() {
+		float result = 0;
+		do{
+			result = scanFloat();
+			if(result < 0){
+				System.out.println("Error, el numero no puede ser negativo");
+			}
+
+		} while (result < 0);
+		
+		return result;
+	}
+
+	public static float scanFloatEntre0y1() {
+		float result = 0;
+		do{
+			result = scanFloat();
+			if(result < 0 || result > 1){
+				System.out.println("Error, el numero no puede ser menor que 0 o mayor que 1");
+			}
+		} while (result < 0 || result > 1);
 		
 		return result;
 	}
@@ -125,81 +163,17 @@ public class Scanf{
 		return result;
 	}
 
-	
-	/**
-	 * Lee una entrada del usuario para determinar si el tipo es "Exterior" o "Interior".
-	 * 
-	 * Este método solicita al usuario que ingrese una cadena de texto y valida que la entrada
-	 * sea "Exterior" o "Interior", sin importar si la entrada está en mayúsculas o minúsculas.
-	 * Si el usuario ingresa un valor no válido, el método seguirá solicitando la entrada
-	 * hasta que reciba un valor correcto.
-	 * 
-	 * @return `true` si el usuario ingresa "Exterior" (sin importar mayúsculas o minúsculas),
-	 *         `false` si el usuario ingresa "Interior" (sin importar mayúsculas o minúsculas).
-	 */
-	public static boolean Scan_Exterior_Interior() {
-		String aux;
+	public static Date scanFechaFutura(){
+		Date fecha = null;
+		Boolean valido = false;
 		do{
-			aux=Scanf.scanString();
-			if(aux.equals("Exterior") || aux.equals("exterior")){
-				return true;
+			fecha = scanFecha();
+			valido = fecha.after(new Date(System.currentTimeMillis()));
+			if(valido == false){
+				System.out.println("Error, la fecha no puede ser anterior a la actual");
 			}
-			else if(aux.equals("Interior") || aux.equals("interior")){
-				return false;
-			}
-			else{
-				System.out.println("Error tipo no valido, vuelva a introducirlo");
-			}
-		}while(true);
-	}
-	
-	/**
-	 * Lee la duración de una reserva de una lista de opciones predefinidas (60, 90 o 120 minutos).
-	 * 
-	 * Este método solicita al usuario que ingrese un número entero correspondiente a la duración de la reserva.
-	 * Si el número ingresado no es válido, es decir, no es 60, 90 ni 120, se muestra un mensaje de error y se solicita la entrada nuevamente.
-	 * 
-	 * Las duraciones válidas son:
-	 * 60 minutos
-	 * 90 minutos
-	 * 120 minutos
-	 * 
-	 * @return La duración seleccionada por el usuario, que debe ser uno de los valores válidos: 60, 90 o 120.
-	 */
-	public static int Scan_Duracion() {
-		int result;
-		do {
-			result=Scanf.scanInt();
-			if(result != 60 && result != 90 && result != 120) {
-				System.out.println("Opcion introducida no valida, vuelva a introducir la duracion");
-			}
-		}while(result != 60 && result != 90 && result != 120);
-		return result;
-	}
-	
-	/**
-	 * Lee el tipo de reserva que el usuario desea seleccionar.
-	 * 
-	 * Este método solicita al usuario que ingrese un número entero correspondiente al tipo de reserva.
-	 * Si el número ingresado no es válido (es decir, no está en el rango de 1 a 3), se muestra un mensaje de error
-	 * y se solicita la entrada nuevamente.
-	 * 
-	 * Los tipos de reserva válidos son:
-	 * 1 - Reserva adultos
-	 * 2 - Reserva infantil
-	 * 3 - Reserva familiar
-	 * 
-	 * @return El tipo de reserva seleccionado por el usuario, que debe ser uno de los valores válidos: 1, 2 o 3.
-	 */
-	public static int Scan_TipoReserva() {
-		int result;
-		do {
-			result=Scanf.scanInt();
-			if(result < 1 || result > 3) {
-				System.out.println("Opcion introducida no valida, vuelva a seleccionar el tipo de reserva");
-			}
-		}while(result < 1 || result > 3);
-		return result;
+		}while(valido == false);
+		return fecha;
 	}
 	
 }

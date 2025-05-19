@@ -186,7 +186,7 @@ public class EventoDAO {
             resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                limite = resultSet.getFloat("limite_reventa");
+                limite = resultSet.getFloat("limiteReventa");
             }
         } catch (SQLException e) {
             System.err.println("Error al consultar el límite de reventa: " + e.getMessage());
@@ -217,7 +217,7 @@ public class EventoDAO {
 
         try {
             Connection connection = dbConnection.getConnection();
-            String sql = sqlProperties.getSQLQuery("listar_eventos_comprar");
+            String sql = "SELECT nombre, descripcion, ubicacion, fecha, limiteReventa FROM eventos";
             preparedStatement = connection.prepareStatement(sql);
             resultSet = preparedStatement.executeQuery();
 
@@ -227,15 +227,22 @@ public class EventoDAO {
                 evento.setDescripcion(resultSet.getString("descripcion"));
                 evento.setLugar(resultSet.getString("ubicacion"));
                 evento.setFecha(resultSet.getDate("fecha"));
+                evento.setLimiteReventa(resultSet.getFloat("limiteReventa"));
                 eventos.add(evento);
             }
 
-            if (preparedStatement != null) {
-                preparedStatement.close();
-            }
-            dbConnection.closeConnection();
         } catch (SQLException e) {
             System.out.println("Error al listar eventos: " + e.getMessage());
+        } finally {
+            try {
+                if (resultSet != null)
+                    resultSet.close();
+                if (preparedStatement != null)
+                    preparedStatement.close();
+                dbConnection.closeConnection();
+            } catch (SQLException e) {
+                System.out.println("Error cerrando recursos: " + e.getMessage());
+            }
         }
 
         return eventos;

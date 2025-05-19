@@ -6,9 +6,11 @@ public class Transaccion {
     private float precio;
     private TipoTransaccion tipo;
 
-    public Transaccion(){}
+    public Transaccion() {
+    }
 
-    public Transaccion(String correoComprador, String correoVendedor, float precio) {
+    public Transaccion(String correoComprador, String correoVendedor, float precio, TipoTransaccion tipo) {
+        this.tipo = tipo;
         this.correoComprador = correoComprador;
         this.correoVendedor = correoVendedor;
         this.precio = precio;
@@ -41,9 +43,9 @@ public class Transaccion {
     public TipoTransaccion getTipo() {
         return tipo;
     }
-    
+
     public void setTipo(TipoTransaccion tipo) {
         this.tipo = tipo;
     }
-    
+
 }

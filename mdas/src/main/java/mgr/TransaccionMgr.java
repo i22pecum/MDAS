@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import dao.*;
 import dto.*;
 
+//Clase que gestiona la lógica de negocio relacionada con transacciones
+
 public class TransaccionMgr {
 
     private static TransaccionMgr instance;
@@ -18,6 +20,11 @@ public class TransaccionMgr {
         return instance;
     }
 
+    /**
+     * Devuelve una lista de entradas del usuario que aún se pueden revender (es decir, entradas asociadas a eventos futuros).
+     * @param correo Correo del usuario
+     * @return Lista de entradas válidas para reventa
+     */
     public ArrayList<Entrada> verEntradasUsuario(String correo) {
         ArrayList<Entrada> entradas = new ArrayList<>();
         ArrayList<Integer> idEntradas = new ArrayList<>();
@@ -45,6 +52,11 @@ public class TransaccionMgr {
         return entradas;
     }
 
+
+    /**
+     * Devuelve el dinero a los compradores y resta el saldo al vendedor en caso de cancelación de evento.
+     * @param nombreEvento Nombre del evento cancelado
+     */
     public void devolverDinero(String nombreEvento) {
         TransaccionDAO transaccionDAO = new TransaccionDAO();
         UsuarioDAO usuarioDAO = new UsuarioDAO();
@@ -63,11 +75,22 @@ public class TransaccionMgr {
         }
     }
 
+    /**
+     * Elimina las transacciones asociadas a un evento.
+     * @param nombreEvento Nombre del evento
+     * @return true si se eliminaron correctamente
+     */
     public Boolean eliminarTransacciones(String nombreEvento) {
         TransaccionDAO transaccionDAO = new TransaccionDAO();
         return transaccionDAO.eliminarTransaccionesByNombreEvento(nombreEvento);
     }
 
+
+    /**
+     * Elimina las entradas asociadas a un evento (tanto en entradas vendidas como en disponibles).
+     * @param nombreEvento Nombre del evento
+     * @return true si se eliminaron correctamente
+     */
     public Boolean eliminarEntradas(String nombreEvento) {
         EntradaDAO entradaDAO = new EntradaDAO();
         ArrayList<Integer> idEntradas = new ArrayList<>();
@@ -81,26 +104,76 @@ public class TransaccionMgr {
         return true;
     }
 
-    public boolean publicarReventa(Entrada entradaReventa) {
+
+    /**
+     * Publica una entrada como reventa y actualiza su ID.
+     * @param entradaReventa Objeto Entrada con los datos de reventa
+     * @param idEntrada ID de la entrada original
+     * @return true si la reventa se publica y actualiza correctamente
+     */
+    public boolean publicarReventa(Entrada entradaReventa, int idEntrada) {
         EntradaDAO entradaDAO = new EntradaDAO();
-        return entradaDAO.insertarReventa(entradaReventa);
+        int idReventa = 0;
+        boolean actualizado = false;
+
+        idReventa = entradaDAO.insertarReventa(entradaReventa);
+
+        if(idReventa != 0){
+            actualizado = entradaDAO.actualizarId(idEntrada, idReventa); 
+        }
+
+        return actualizado;
     }
 
-    public ArrayList<Entrada> verEntradasPorEvento(String nombreEvento) {
+
+    /**
+     * Lista las entradas disponibles para un evento concreto y tipo de transacción (primaria/secundaria).
+     * @param nombreEvento Nombre del evento
+     * @param tipoTransaccion Tipo de transacción (primaria o secundaria)
+     * @return Lista de entradas disponibles
+     */
+    public ArrayList<Entrada> verEntradasPorEvento(String nombreEvento, TipoTransaccion tipoTransaccion) {
         EntradaDAO entradaDAO = new EntradaDAO();
-        return entradaDAO.getEntradasByNombreEvento(nombreEvento);
+        return entradaDAO.getEntradasDisponiblesByNombreEvento(nombreEvento, tipoTransaccion);
     }
 
-    public boolean comprarEntrada(String correoUsuario, String nombreEvento, TipoEntrada tipoEntrada) {
+
+    /**
+     * Procesa la compra de una entrada, actualiza stock, transacciones y monederos.
+     * @param correoUsuario Correo del comprador
+     * @param entrada Objeto Entrada comprada
+     * @param tipoTransaccion Tipo de transacción (primaria o secundaria)
+     * @return true si la compra fue exitosa
+     */
+    public boolean comprarEntrada(String correoUsuario, Entrada entrada, TipoTransaccion tipoTransaccion) {
         EntradaDAO entradaDAO = new EntradaDAO();
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        Transaccion transaccion = new Transaccion(correoUsuario, entrada.getCorreoVendedor(), entrada.getPrecio(),
+                tipoTransaccion);
+        TransaccionDAO transaccionDAO = new TransaccionDAO();
+        OrganizadorDAO organizadorDAO = new OrganizadorDAO();
 
-        // Directamente llamar al método comprarEntrada del DAO con los datos necesarios
-        return entradaDAO.comprarEntrada(correoUsuario, nombreEvento, tipoEntrada);
-    }
+        
+        entradaDAO.disminuirCantidadEntrada(entrada.getId());
+        
+        entradaDAO.insertarEntradaVendida(entrada.getId(), correoUsuario);
 
-    public float getLimiteReventaEvento(String nombreEvento) {
-        EventoDAO eventoDAO = new EventoDAO();
-        return eventoDAO.consultarLimiteReventa(nombreEvento);
+        
+        usuarioDAO.restarMonedero(correoUsuario, entrada.getPrecio());
+
+        
+        if (tipoTransaccion.equals(TipoTransaccion.VENTASECUNDARIA) == true) {
+            usuarioDAO.recargarMonedero(entrada.getCorreoVendedor(), entrada.getPrecio());
+        } else {
+            
+            organizadorDAO.recargarMonedero(entrada.getCorreoVendedor(), entrada.getPrecio());
+        }
+
+        
+        transaccionDAO.insertarTransaccion(transaccion, entrada.getNombreEvento());
+
+        
+        return true;
     }
 
 }

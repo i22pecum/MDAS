@@ -71,6 +71,7 @@ public class EntradaDAO {
         DBConnection dbConnection = new DBConnection();
         TipoEntrada tipoEntrada = null;
         String nombreEvento = null;
+        Entrada entrada = null;
         float precio = 0;
         try {
             Connection connection = dbConnection.getConnection();
@@ -81,10 +82,12 @@ public class EntradaDAO {
                 ResultSet rs = pstmt.executeQuery();
 
                 while (rs.next()) {
-                    tipoEntrada = TipoEntrada.valueOf(rs.getString("tipoEntrada"));
+                    tipoEntrada = TipoEntrada.valueOf(rs.getString("tipo"));
                     precio = rs.getFloat("precio");
-                    nombreEvento = rs.getString("nombreEvento");
-                    entradas.add(EntradaFactory.createEntrada(tipoEntrada, precio, nombreEvento));
+                    nombreEvento = rs.getString("evento");
+                    entrada = EntradaFactory.createEntrada(tipoEntrada, precio, nombreEvento);
+                    entrada.setId(id);
+                    entradas.add(entrada);
                 }
             }
         } catch (SQLException e) {
@@ -159,6 +162,7 @@ public class EntradaDAO {
             preparedStatement.setString(3, entrada.getNombreEvento());
             preparedStatement.setInt(4, entrada.getCantidad());
             preparedStatement.setString(5, TipoTransaccion.VENTAPRIMARIA.name());
+            preparedStatement.setString(6, entrada.getCorreoVendedor());
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
@@ -168,7 +172,7 @@ public class EntradaDAO {
             System.err.println("Error al insertar entrada: " + e.getMessage());
             publicada = false;
         } finally {
-            // Cerrar recursos en el bloque finally para evitar fugas
+        
             try {
                 if (preparedStatement != null) {
                     preparedStatement.close();
@@ -198,10 +202,8 @@ public class EntradaDAO {
 
         try {
             conn = dbConnection.getConnection();
-            conn.setAutoCommit(false); // Iniciar transacción
+            conn.setAutoCommit(false); 
 
-            // 1. Obtener detalles de la entrada (precio, disponibles, evento) con bloqueo
-            // FOR UPDATE
             String sqlEntrada = "SELECT precio, cantidad AS disponibles FROM entradas WHERE nombreEvento = ? AND tipo = ? FOR UPDATE";
             psSelectEntrada = conn.prepareStatement(sqlEntrada);
             psSelectEntrada.setString(1, nombreEvento);
@@ -210,7 +212,7 @@ public class EntradaDAO {
 
             if (!rsEntrada.next()) {
                 conn.rollback();
-                return false; // Entrada no existe
+                return false; 
             }
 
             float precio = rsEntrada.getFloat("precio");
@@ -218,10 +220,10 @@ public class EntradaDAO {
 
             if (disponibles <= 0) {
                 conn.rollback();
-                return false; // No hay entradas disponibles
+                return false; 
             }
 
-            // 2. Consultar saldo del usuario con bloqueo FOR UPDATE
+           
             String sqlUsuario = "SELECT monedero FROM usuarios WHERE correo = ? FOR UPDATE";
             psSelectUsuario = conn.prepareStatement(sqlUsuario);
             psSelectUsuario.setString(1, correoUsuario);
@@ -229,23 +231,23 @@ public class EntradaDAO {
 
             if (!rsUsuario.next()) {
                 conn.rollback();
-                return false; // Usuario no encontrado
+                return false; 
             }
 
             float saldo = rsUsuario.getFloat("monedero");
             if (saldo < precio) {
                 conn.rollback();
-                return false; // Saldo insuficiente
+                return false; 
             }
 
-            // 3. Actualizar entradas disponibles (cantidad - 1)
+           
             String sqlUpdateEntrada = "UPDATE entradas SET cantidad = cantidad - 1 WHERE nombreEvento = ? AND tipo = ?";
             psUpdateEntrada = conn.prepareStatement(sqlUpdateEntrada);
             psUpdateEntrada.setString(1, nombreEvento);
             psUpdateEntrada.setString(2, tipoEntrada.name());
             psUpdateEntrada.executeUpdate();
 
-            // 4. Insertar en entradasVendidas
+        
             String sqlInsertVendida = "INSERT INTO entradasVendidas (nombreEvento, tipo, correoUsuario) VALUES (?, ?, ?)";
             psInsertVendida = conn.prepareStatement(sqlInsertVendida);
             psInsertVendida.setString(1, nombreEvento);
@@ -253,21 +255,21 @@ public class EntradaDAO {
             psInsertVendida.setString(3, correoUsuario);
             psInsertVendida.executeUpdate();
 
-            // 5. Actualizar monedero usuario (saldo - precio)
+           
             String sqlUpdateMonedero = "UPDATE usuarios SET monedero = monedero - ? WHERE correo = ?";
             psUpdateMonedero = conn.prepareStatement(sqlUpdateMonedero);
             psUpdateMonedero.setFloat(1, precio);
             psUpdateMonedero.setString(2, correoUsuario);
             psUpdateMonedero.executeUpdate();
 
-            // 6. Insertar transacción (tipo VENTAPRIMARIA, fecha actual)
+          
             String sqlInsertTransaccion = "INSERT INTO transacciones (tipo, importe, fecha, comprador, vendedor) VALUES (?, ?, ?, ?, ?)";
             psInsertTransaccion = conn.prepareStatement(sqlInsertTransaccion);
             psInsertTransaccion.setString(1, "VENTAPRIMARIA");
             psInsertTransaccion.setFloat(2, precio);
             psInsertTransaccion.setDate(3, new java.sql.Date(System.currentTimeMillis()));
             psInsertTransaccion.setString(4, correoUsuario);
-            psInsertTransaccion.setString(5, "ORGANIZADOR"); // vendedor fijo
+            psInsertTransaccion.setString(5, "ORGANIZADOR"); 
 
             psInsertTransaccion.executeUpdate();
 
@@ -303,7 +305,7 @@ public class EntradaDAO {
                 if (psInsertTransaccion != null)
                     psInsertTransaccion.close();
                 if (conn != null) {
-                    conn.setAutoCommit(true); // Restaurar autoCommit
+                    conn.setAutoCommit(true); 
                     conn.close();
                 }
             } catch (SQLException e) {
@@ -312,47 +314,83 @@ public class EntradaDAO {
         }
     }
 
-    public boolean insertarReventa(Entrada entrada) {
+    public int insertarReventa(Entrada entrada) {
         DBConnection dbConnection = new DBConnection();
         PreparedStatement preparedStatement = null;
         Connection connection = null;
-        boolean publicada = false;
+        ResultSet generatedKeys = null;
+        int idReventa = 0;
+        TipoTransaccion tipotransaccion = TipoTransaccion.VENTASECUNDARIA;
 
         try {
             connection = dbConnection.getConnection();
             String sql = sqlProperties.getSQLQuery("insertar_reventa");
-            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, entrada.getNombreEvento());
             preparedStatement.setString(2, entrada.getCorreoVendedor());
             preparedStatement.setString(3, entrada.getTipo().name());
             preparedStatement.setFloat(4, entrada.getPrecio());
-            preparedStatement.setString(5, "SECUNDARIA"); // tipo de venta fija
+            preparedStatement.setString(5, tipotransaccion.name());
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                publicada = true;
+                generatedKeys = preparedStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    idReventa = generatedKeys.getInt(1); 
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error al insertar entrada de reventa: " + e.getMessage());
-            publicada = false;
         } finally {
-            // Cerrar recursos en el bloque finally para evitar fugas
+       
             try {
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
-                if (connection != null) {
-                    connection.close();
-                }
+                if (generatedKeys != null) generatedKeys.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
             } catch (SQLException e) {
                 System.err.println("Error al cerrar recursos: " + e.getMessage());
             }
         }
 
-        return publicada;
+        return idReventa;
     }
 
-    public ArrayList<Entrada> getEntradasByNombreEvento(String nombreEvento) {
+    public boolean actualizarId(int idEntradaOriginal, int idReventa) {
+        DBConnection dbConnection = new DBConnection();
+        PreparedStatement preparedStatement = null;
+        Connection connection = null;
+        boolean actualizado = false;
+
+        try {
+            connection = dbConnection.getConnection();
+            String sql = sqlProperties.getSQLQuery("actualizar_id_entrada_vendida");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, idReventa);
+            preparedStatement.setInt(2, idEntradaOriginal);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                actualizado = true;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar id de entrada vendida: " + e.getMessage());
+        } finally {
+  
+            try {
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                System.err.println("Error al cerrar recursos: " + e.getMessage());
+            }
+        }
+
+        return actualizado;
+    }
+
+
+
+    public ArrayList<Entrada> getEntradasDisponiblesByNombreEvento(String nombreEvento,
+            TipoTransaccion tipoTransaccion) {
         ArrayList<Entrada> entradas = new ArrayList<>();
         DBConnection dbConnection = new DBConnection();
         PreparedStatement preparedStatement = null;
@@ -360,20 +398,22 @@ public class EntradaDAO {
 
         try {
             Connection connection = dbConnection.getConnection();
-            String sql = "SELECT tipo, precio, evento FROM entradas WHERE evento = ?";
+            String sql = "SELECT id, tipo, precio, correoVendedor FROM entradas WHERE evento = ? AND tipoVenta = ? AND disponibles > 0";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, nombreEvento);
+            preparedStatement.setString(2, tipoTransaccion.name());
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
                 Entrada entrada = new Entrada();
 
-                // Convierte el String a enum TipoEntrada
+
+                entrada.setId(resultSet.getInt("id"));
                 String tipoStr = resultSet.getString("tipo");
                 entrada.setTipo(TipoEntrada.valueOf(tipoStr));
-
                 entrada.setPrecio(resultSet.getFloat("precio"));
-                entrada.setNombreEvento(resultSet.getString("evento"));
+                entrada.setCorreoVendedor(resultSet.getString("correoVendedor"));
+                entrada.setNombreEvento(nombreEvento);
 
                 entradas.add(entrada);
             }
@@ -395,4 +435,68 @@ public class EntradaDAO {
         return entradas;
     }
 
+    public boolean disminuirCantidadEntrada(int idEntrada) {
+        DBConnection dbConnection = new DBConnection();
+        Connection conn = null;
+        PreparedStatement psUpdateEntrada = null;
+
+        try {
+            conn = dbConnection.getConnection();
+
+            String sqlUpdateEntrada = "UPDATE entradas SET disponibles = disponibles - 1 WHERE id = ?";
+            psUpdateEntrada = conn.prepareStatement(sqlUpdateEntrada);
+            psUpdateEntrada.setInt(1, idEntrada);
+            int filasAfectadas = psUpdateEntrada.executeUpdate();
+            return filasAfectadas > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error al disminuir cantidad de entrada: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                if (psUpdateEntrada != null)
+                    psUpdateEntrada.close();
+                dbConnection.closeConnection();
+            } catch (SQLException e) {
+                System.out.println("Error cerrando recursos: " + e.getMessage());
+            }
+        }
+    }
+
+    public boolean insertarEntradaVendida(int idEntrada, String correoUsuario) {
+        DBConnection dbConnection = new DBConnection();
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        boolean insertada = false;
+
+        try {
+            connection = dbConnection.getConnection();
+            String sql = sqlProperties.getSQLQuery("insertar_entrada_vendida");
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, idEntrada);
+            preparedStatement.setString(2, correoUsuario);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                insertada = true;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al insertar entrada vendida: " + e.getMessage());
+            insertada = false;
+        } finally {
+
+            try {
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println("Error al cerrar recursos: " + e.getMessage());
+            }
+        }
+
+        return insertada;
+    }
 }

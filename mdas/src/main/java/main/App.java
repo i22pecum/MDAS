@@ -5,7 +5,15 @@ import java.util.ArrayList;
 import dto.*;
 import mgr.*;
 
+/* Clase utilizada para almacenar el estado completo de la aplicación:
+* incluye los usuarios registrados, las sesiones disponibles y las entradas.
+* Esta clase se serializa para guardar y recuperar el estado al cerrar o iniciar la aplicación.
+*/
 public class App {
+    /* Función principal de la aplicación.
+    * Muestra un menú interactivo
+    * El registro solicita al usuario sus datos personales y llama al método correspondiente del gestor de usuarios.
+    */
     public static void main(String[] args) {
         int opc;
         UsuarioMgr usuarioMgr = UsuarioMgr.getInstance();
@@ -20,14 +28,13 @@ public class App {
 
             opc = aux.Scanf.scanInt();
 
-            // Para hacer un clear de la terminal
             App.clearConsole();
 
             switch (opc) {
                 case 0:
                     System.out.println("\nSaliendo de la aplicación");
                     break;
-                case 1: // Funcion de registrarse
+                case 1:
                     System.out.println("\nIntroduce tu correo:");
                     usuario.setCorreo(aux.Scanf.scanString());
                     System.out.println("\nIntroduce tu contraseña:");
@@ -35,7 +42,7 @@ public class App {
                     System.out.println("\nIntroduce tu nombre y apellidos:");
                     usuario.setNombreCompleto(aux.Scanf.scanString());
                     System.out.println("\nIntroduce tu numero de teléfono:");
-                    usuario.setTelefono(aux.Scanf.scanInt());
+                    usuario.setTelefono(aux.Scanf.scanIntPositivo());
                     System.out.println("\nIntroduce tu DNI:");
                     usuario.setDni(aux.Scanf.scanDni());
 
@@ -58,6 +65,11 @@ public class App {
 
     }
 
+    /**
+     * Muestra la interfaz de inicio de sesión para el usuario o el organizador.
+     * Permite seleccionar el tipo de inicio de sesión, introducir credenciales
+     * y acceder a la interfaz correspondiente si las credenciales son válidas.
+     */
     public static void interfazIniciarSesion() {
         int opcIS;
         UsuarioMgr usuarioMgr = UsuarioMgr.getInstance();
@@ -78,7 +90,6 @@ public class App {
                     System.out.println("\nVolviendo al Menú Principal");
                     break;
                 case 1:
-                    // Inicio como organizador
                     System.out.println("\nIntroduce tu correo:");
                     organizador.setCorreo(aux.Scanf.scanString());
                     System.out.println("\nIntroduce tu contraseña:");
@@ -93,7 +104,6 @@ public class App {
                     }
                     break;
                 case 2:
-                    // Inicio como usuario
                     System.out.println("\nIntroduce tu correo:");
                     usuario.setCorreo(aux.Scanf.scanString());
                     System.out.println("\nIntroduce tu contraseña:");
@@ -114,11 +124,16 @@ public class App {
         } while (opcIS != 0);
     }
 
-    /*
-     * Lo mismo hay que pasar como argumento el correo
-     */
+    /**
+     * Muestra el menú de opciones disponibles para un usuario autenticado y gestiona
+     * las acciones seleccionadas como comprar entradas, publicar reventas, recargar
+     * el monedero, ver entradas, valorar usuarios y gestionar reclamaciones.
+     *
+     * @param correoUsuario El correo del usuario que ha iniciado sesión.
+     **/
     public static void interfazUsuario(String correoUsuario) {
-        int opc, contador = 0;
+        int opc, contador = 0, entradaSeleccionada = 0;
+        TipoTransaccion tipoTransaccion = null;
 
         UsuarioMgr usuarioMgr = UsuarioMgr.getInstance();
         Usuario usuario = new Usuario();
@@ -129,6 +144,7 @@ public class App {
         float saldoActual = 0, cantidad = 0, saldoNuevo = 0;
         Boolean recargaMonedero = false;
         ArrayList<Entrada> entradas = new ArrayList<Entrada>();
+        Entrada entradaCompra = new Entrada();
         ArrayList<Evento> eventosDisponibles = new ArrayList<Evento>();
 
         do {
@@ -143,7 +159,6 @@ public class App {
 
             opc = aux.Scanf.scanInt();
 
-            // Para hacer un clear de la terminal
             App.clearConsole();
 
             switch (opc) {
@@ -151,16 +166,14 @@ public class App {
                     System.out.println("\nCerrando sesión");
                     break;
                 case 1:
-                    // Funcion de comprar entradas
 
-                    // 1. Mostrar eventos disponibles
                     System.out.println("\nEventos disponibles:");
                     ArrayList<Evento> listarEventosDisponibles = eventoMgr.listarEventosComprar();
 
                     if (listarEventosDisponibles.isEmpty()) {
                         System.out.println("No hay eventos disponibles.");
                     } else {
-                        for (Evento evento : eventosDisponibles) {
+                        for (Evento evento : listarEventosDisponibles) {
                             System.out.println("Nombre: " + evento.getNombre());
                             System.out.println("Descripción: " + evento.getDescripcion());
                             System.out.println("Lugar: " + evento.getLugar());
@@ -169,37 +182,36 @@ public class App {
                         }
                     }
 
-                    // 2. Pedir evento
                     System.out.println("\nIntroduce el nombre del evento para comprar entrada:");
                     String eventoCompra = aux.Scanf.scanString();
 
-                    // 3. Mostrar tipos de entrada disponibles para ese evento
+                    tipoTransaccion = interfazSeleccionarTipoCompra();
+
                     System.out.println("\nEntradas disponibles para el evento: " + eventoCompra);
-                    ArrayList<Entrada> entradasDisponibles = transaccionMgr.verEntradasPorEvento(eventoCompra);
+                    ArrayList<Entrada> entradasDisponibles = transaccionMgr.verEntradasPorEvento(eventoCompra,
+                            tipoTransaccion);
 
                     if (entradasDisponibles.isEmpty()) {
                         System.out.println("No hay entradas disponibles para este evento.");
+                        break;
                     } else {
+
+                        contador = 1;
+
                         for (Entrada entrada : entradasDisponibles) {
-                            System.out.println("Tipo: " + entrada.getTipo());
+                            System.out.println("\n" + contador + ".- Tipo: " + entrada.getTipo());
                             System.out.println("Precio: " + entrada.getPrecio() + "€");
                             System.out.println("--------------------------");
+                            contador++;
                         }
                     }
 
-                    // 4. Pedir tipo de entrada
-                    System.out.println("\nIntroduce el tipo de entrada (GENERAL, VIP, NUMERADA):");
-                    String tipoEntradaStr = aux.Scanf.scanString();
+                    System.out.println("Selecciona la entrada:");
+                    entradaSeleccionada = aux.Scanf.scanIntPositivo() - 1;
 
-                    TipoEntrada tipoEntradaCompra = null;
-                    try {
-                        tipoEntradaCompra = TipoEntrada.valueOf(tipoEntradaStr.toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Tipo de entrada no válido.");
-                    }
+                    entradaCompra = entradasDisponibles.get(entradaSeleccionada);
 
-                    // 5. Ejecutar compra
-                    boolean exitoCompra = transaccionMgr.comprarEntrada(correoUsuario, eventoCompra, tipoEntradaCompra);
+                    boolean exitoCompra = transaccionMgr.comprarEntrada(correoUsuario, entradaCompra, tipoTransaccion);
 
                     if (exitoCompra) {
                         System.out.println("\nCompra realizada con éxito.");
@@ -209,7 +221,6 @@ public class App {
 
                     break;
                 case 2:
-                    // Función de publicar reventa
                     entradas = transaccionMgr.verEntradasUsuario(correoUsuario);
                     contador = 1;
                     App.clearConsole();
@@ -230,7 +241,7 @@ public class App {
                     }
 
                     System.out.println("\nSelecciona el número de la entrada que deseas revender:");
-                    int entradaSeleccionada = aux.Scanf.scanInt() - 1;
+                    entradaSeleccionada = aux.Scanf.scanIntPositivo() - 1;
 
                     if (entradaSeleccionada < 0 || entradaSeleccionada >= entradas.size()) {
                         System.out.println("\nSelección inválida.");
@@ -239,23 +250,22 @@ public class App {
 
                     Entrada entradaReventa = entradas.get(entradaSeleccionada);
 
-                    float limiteReventaEvento = 0;// eventoMgr.getLimiteReventaEvento(entradaReventa.getNombreEvento());
+                    float limiteReventaEvento = eventoMgr.getLimiteReventaEvento(entradaReventa.getNombreEvento());
 
                     System.out.println("\nIntroduce el precio de reventa (máximo permitido: " +
-                            (entradaReventa.getPrecio() * limiteReventaEvento) + "):");
-                    float precioReventa = aux.Scanf.scanFloat();
+                            (entradaReventa.getPrecio() * (1 + limiteReventaEvento)) + "):");
+                    float precioReventa = aux.Scanf.scanFloatPositivo();
 
                     if (precioReventa <= 0
-                            || precioReventa > (entradaReventa.getPrecio() * limiteReventaEvento)) {
+                            || precioReventa > (entradaReventa.getPrecio() * (1 + limiteReventaEvento))) {
                         System.out.println("\nPrecio inválido. Debe estar dentro del límite de reventa.");
                         break;
                     }
 
-                    // Publicar la entrada como reventa
                     Entrada nuevaReventa = EntradaFactory.createEntradaConCorreoVendedor(entradaReventa.getTipo(),
                             precioReventa, entradaReventa.getNombreEvento(), correoUsuario);
 
-                    boolean publicada = transaccionMgr.publicarReventa(entradaReventa);
+                    boolean publicada = transaccionMgr.publicarReventa(nuevaReventa, entradaReventa.getId());
 
                     if (publicada) {
                         System.out.println("\nEntrada publicada para reventa con éxito.");
@@ -264,12 +274,11 @@ public class App {
                     }
 
                     break;
-                case 3: // Terminado
-                    // Funcion de recargar monedero
+                case 3:
                     saldoActual = usuarioMgr.consultarMonedero(correoUsuario);
                     System.out.println("\nSaldo actual: " + saldoActual);
                     System.out.println("Introduce la cantidad a recargar:");
-                    cantidad = aux.Scanf.scanFloat();
+                    cantidad = aux.Scanf.scanFloatPositivo();
 
                     if (cantidad > 0) {
                         recargaMonedero = usuarioMgr.recargarMonedero(correoUsuario, cantidad);
@@ -283,8 +292,7 @@ public class App {
                         System.out.println("\nCantidad inválida.");
                     }
                     break;
-                case 4: // Terminado
-                    // Funcion de ver mis entradas
+                case 4:
                     entradas = transaccionMgr.verEntradasUsuario(correoUsuario);
                     contador = 1;
                     App.clearConsole();
@@ -302,12 +310,10 @@ public class App {
                     }
 
                     break;
-                case 5: // Terminado
-                    // Funcion de Valorar Usuario
+                case 5: 
                     System.out.println("\nLo sentimos, esta función no se ha implementado todavia");
                     break;
-                case 6: // Terminado
-                    // Funcion de Reclamar/Consultar
+                case 6:
                     System.out.println("\nLo sentimos, esta función no se ha implementado todavia");
                     break;
                 default:
@@ -317,6 +323,42 @@ public class App {
         } while (opc != 0);
     }
 
+    /**
+     * Muestra un menú para seleccionar el tipo de transacción que el usuario desea realizar
+     * al comprar una entrada. El usuario puede elegir entre compra primaria o secundaria.
+     *
+     * @return TipoTransaccion seleccionado por el usuario
+     **/
+    private static TipoTransaccion interfazSeleccionarTipoCompra() {
+        int opc;
+        TipoTransaccion tipoTransaccion = null;
+
+        do {
+            System.out.println("\nSelecciona el tipo de compra:" +
+                    "\n1.- Compra Primaria" +
+                    "\n2.- Compra Secundaria");
+
+            opc = aux.Scanf.scanInt();
+
+            switch (opc) {
+                case 1:
+                    tipoTransaccion = TipoTransaccion.VENTAPRIMARIA;
+                    break;
+                case 2:
+                    tipoTransaccion = TipoTransaccion.VENTASECUNDARIA;
+                    break;
+                default:
+                    System.out.println("\nLa opción seleccionada no existe");
+                    break;
+            }
+        } while (opc != 1 && opc != 2);
+
+        return tipoTransaccion;
+    }
+     /**
+     * Muestra la interfaz de interacción para un organizador de eventos, 
+     * @param correoOrganizador Correo electrónico del organizador autenticado, usado para identificar sus eventos.
+     */
     public static void interfazOrganizador(String correoOrganizador) {
         int opc;
         int contador = 0;
@@ -338,7 +380,7 @@ public class App {
 
             opc = aux.Scanf.scanInt();
 
-            // Para hacer un clear de la terminal
+
             App.clearConsole();
 
             switch (opc) {
@@ -346,7 +388,6 @@ public class App {
                     System.out.println("\nCerrando sesión");
                     break;
                 case 1:
-                    // Funcion de publicar evento
                     Evento Evento = new Evento();
 
                     evento.setCorreoOrganizador(correoOrganizador);
@@ -361,34 +402,34 @@ public class App {
                     evento.setLugar(aux.Scanf.scanString());
 
                     System.out.println("\nIntroduce la fecha (formato yyyy-MM-dd):");
-                    evento.setFecha(aux.Scanf.scanFecha());
+                    evento.setFecha(aux.Scanf.scanFechaFutura());
 
                     System.out.println("\nIntroduce el limite de reventa (0,%):");
-                    evento.setLimiteReventa(aux.Scanf.scanFloat());
+                    evento.setLimiteReventa(aux.Scanf.scanFloatEntre0y1());
 
                     System.out.println("\nIntroduce la cantidad de entradas Generales:");
-                    cantidad = aux.Scanf.scanInt();
+                    cantidad = aux.Scanf.scanIntPositivo();
 
                     System.out.println("\nIntroduce el precio de las entradas Generales:");
-                    precio = aux.Scanf.scanFloat();
+                    precio = aux.Scanf.scanFloatPositivo();
 
-                    entradas.add(EntradaFactory.createEntradaGeneralConCantidad(precio, evento.getNombre(), cantidad));
+                    entradas.add(EntradaFactory.createEntradaGeneralCompleto(precio, evento.getNombre(), cantidad, correoOrganizador));
 
                     System.out.println("\nIntroduce la cantidad de entradas VIP:");
-                    cantidad = aux.Scanf.scanInt();
+                    cantidad = aux.Scanf.scanIntPositivo();
 
                     System.out.println("\nIntroduce el precio de las entradas VIP:");
-                    precio = aux.Scanf.scanFloat();
+                    precio = aux.Scanf.scanFloatPositivo();
 
-                    entradas.add(EntradaFactory.createEntradaVIPConCantidad(precio, evento.getNombre(), cantidad));
+                    entradas.add(EntradaFactory.createEntradaVIPCompleto(precio, evento.getNombre(), cantidad, correoOrganizador));
 
                     System.out.println("\nIntroduce la cantidad de entradas Numeradas:");
-                    cantidad = aux.Scanf.scanInt();
+                    cantidad = aux.Scanf.scanIntPositivo();
 
                     System.out.println("\nIntroduce el precio de las entradas Numeradas:");
-                    precio = aux.Scanf.scanFloat();
+                    precio = aux.Scanf.scanFloatPositivo();
 
-                    entradas.add(EntradaFactory.createEntradaNumeradaConCantidad(precio, evento.getNombre(), cantidad));
+                    entradas.add(EntradaFactory.createEntradaNumeradaCompleto(precio, evento.getNombre(), cantidad, correoOrganizador));
 
                     boolean publicado = eventoMgr.publicarEvento(evento, entradas);
 
@@ -399,11 +440,6 @@ public class App {
                     }
                     break;
                 case 2:
-                    // Funcion de modificar evento
-
-                    /*
-                     * SE TIENE QUE HACER UNA INTERFAZ APARTE PARA ESTO
-                     */
                     System.out.println("Selecciona el evento que deseas modificar:");
                     eventos = eventoMgr.verEventosOrganizador(correoOrganizador);
 
@@ -423,11 +459,6 @@ public class App {
 
                     evento = eventos.get(eventoSeleccionado);
 
-                    /*
-                     * Mostrar información del evento seleccionado
-                     * 
-                     * ES POSIBLE Q SEA RECOMENDABLE HACERLO EN UNA FUNCIÓN APARTE !!!!!!!
-                     */
                     System.out.println("\nInformación del evento seleccionado:");
                     System.out.println("Nombre: " + evento.getNombre());
                     System.out.println("Descripción: " + evento.getDescripcion());
@@ -457,28 +488,15 @@ public class App {
                     }
 
                     break;
-                case 3: // Terminado
-                    // Funcion de cancelar evento
-
-                    /*
-                     * SE TIENE QUE HACER UNA INTERFAZ APARTE PARA ESTO
-                     */
+                case 3: 
                     System.out.println("Selecciona el evento que deseas cancelar:");
                     eventos = eventoMgr.verEventosOrganizador(correoOrganizador);
 
-                    contador = 1;
+                    evento = interfazSeleccionarEvento(eventos);
 
-                    if (eventos.isEmpty()) {
-                        System.out.println("\nNo tienes eventos publicados");
+                    if (evento == null) {
                         break;
                     }
-
-                    for (Evento eventoDisponible : eventos) {
-                        System.out.println("\n" + contador + ".- " + eventoDisponible.getNombre());
-                        contador++;
-                    }
-                    eventoSeleccionado = aux.Scanf.scanInt() - 1;
-                    evento = eventos.get(eventoSeleccionado);
 
                     transaccionMgr.devolverDinero(evento.getNombre());
 
@@ -496,35 +514,15 @@ public class App {
 
                     break;
                 case 4:
-                    // Funcion de ver mis eventos
-
-                    /*
-                     * SE TIENE QUE HACER UNA INTERFAZ APARTE PARA ESTO
-                     */
                     System.out.println("\nEventos publicados por el organizador: " + correoOrganizador);
                     eventos = eventoMgr.verEventosOrganizador(correoOrganizador);
 
-                    contador = 1;
+                    evento = interfazSeleccionarEvento(eventos);
 
-                    if (eventos.isEmpty()) {
-                        System.out.println("\nNo tienes eventos publicados");
+                    if (evento == null) {
                         break;
                     }
 
-                    for (Evento eventoDisponible : eventos) {
-                        System.out.println("\n" + contador + ".- " + eventoDisponible.getNombre());
-                        contador++;
-                    }
-
-                    eventoSeleccionado = aux.Scanf.scanInt() - 1;
-
-                    evento = eventos.get(eventoSeleccionado);
-
-                    /*
-                     * Mostrar información del evento seleccionado
-                     * 
-                     * ES POSIBLE Q SEA RECOMENDABLE HACERLO EN UNA FUNCIÓN APARTE !!!!!!!
-                     */
                     System.out.println("\nInformación del evento seleccionado:");
                     System.out.println("Nombre: " + evento.getNombre());
                     System.out.println("Descripción: " + evento.getDescripcion());
@@ -538,6 +536,36 @@ public class App {
                     break;
             }
         } while (opc != 0);
+    }
+    
+     /**
+     * Muestra una lista numerada de eventos y permite al usuario seleccionar uno de ellos por su posición.
+     * @param eventos Lista de eventos disponibles para seleccionar.
+     * @return El evento seleccionado por el usuario o null si la lista está vacía.
+     */
+    private static Evento interfazSeleccionarEvento(ArrayList<Evento> eventos) {
+        int contador = 1, eventoSeleccionado = 0;
+        Evento evento = new Evento();
+
+        if (eventos.isEmpty()) {
+            System.out.println("\nNo tienes eventos publicados");
+            return null;
+        }
+
+        do {
+
+            for (Evento eventoDisponible : eventos) {
+                System.out.println("\n" + contador + ".- " + eventoDisponible.getNombre());
+                contador++;
+            }
+
+            eventoSeleccionado = aux.Scanf.scanInt() - 1;
+
+        } while (eventoSeleccionado < 0 || eventoSeleccionado >= eventos.size());
+
+        evento = eventos.get(eventoSeleccionado);
+
+        return evento;
     }
 
     private static void clearConsole() {

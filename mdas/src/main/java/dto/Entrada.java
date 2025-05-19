@@ -3,6 +3,7 @@ package dto;
 import dto.TipoEntrada;
 
 public class Entrada {
+    int id;
     TipoEntrada tipo;
     float precio;
     String nombreEvento;
@@ -29,7 +30,31 @@ public class Entrada {
         this.correoVendedor = correoVendedor;
     }
 
+    public Entrada(TipoEntrada tipo, float precio, String nombreEvento, int cantidad, String correoVendedor) {
+        this.tipo = tipo;
+        this.precio = precio;
+        this.nombreEvento = nombreEvento;
+        this.cantidad = cantidad;
+        this.correoVendedor = correoVendedor;
+    }
+
     public Entrada() {
+    }
+
+    public Entrada(int id, TipoEntrada tipo, float precio, String nombreEvento, String correoVendedor) {
+        this.id = id;
+        this.tipo = tipo;
+        this.precio = precio;
+        this.nombreEvento = nombreEvento;
+        this.correoVendedor = correoVendedor;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public TipoEntrada getTipo() {
