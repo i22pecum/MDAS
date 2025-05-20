@@ -46,7 +46,7 @@ Si este script diera error a la hora de crear el usuario tendriamos que entrar a
 ```sql
 ALTER USER 'root'@'localhost' IDENTIFIED BY '1234';
 ```
-Este comando nos cambiaria la contraseña del usuario root dentro de la base de datos a *1234*
+Este comando nos cambiaria la contraseña del usuario *root* dentro de la base de datos a *1234*
 
 
 Para cargar los datos dentro de la base de datos habra que tener en el directorio actual el fichero backup.sql y hacer:
