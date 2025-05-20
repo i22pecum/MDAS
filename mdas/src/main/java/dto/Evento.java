@@ -2,6 +2,9 @@ package dto;
 
 import java.sql.Date;
 
+/**
+ * Clase que representa un evento.
+ */
 public class Evento {
     private String nombre;
     private String descripcion;

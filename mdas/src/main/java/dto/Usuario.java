@@ -1,5 +1,8 @@
 package dto;
 
+/**
+ * Clase que representa un usuario de la aplicación.
+ */
 public class Usuario {
     String correo;
     String contrasena;

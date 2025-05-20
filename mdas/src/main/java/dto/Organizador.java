@@ -1,5 +1,8 @@
 package dto;
 
+/**
+ * Clase que representa un organizador de eventos.
+ */
 public class Organizador {
     String correo;
     String contrasena;

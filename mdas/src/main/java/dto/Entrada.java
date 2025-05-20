@@ -2,6 +2,9 @@ package dto;
 
 import dto.TipoEntrada;
 
+/**
+ * Clase que representa una entrada de un evento.
+ */
 public class Entrada {
     int id;
     TipoEntrada tipo;

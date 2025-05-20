@@ -1,5 +1,8 @@
 package dto;
 
+/**
+ * Clase que representa una transacción entre un comprador y un vendedor.
+ */
 public class Transaccion {
     private String correoComprador;
     private String correoVendedor;
