@@ -35,6 +35,12 @@ Y dentro de cada carpeta encontramos los siguientes archivos:
 - **mgr** --> Las clases que se encargan de comunicar el main con los DAOs y ademas de hacer comprobaciones adicionales
 - **main** --> La clase donde se define el main de la aplicacion
 
+# Claves de Acceso
+Para acceder a la aplicacion hay varios organizadores y usuarios creados, entre ellos aqui estan las credenciales de un usuario y un organizador:
+Usuario --> Correo: i22pecum@uco.es Contraseña: 1234
+
+Organizador --> Correo: organizador@gmail.com Contraseña: 1234
+
 # Base de datos
 Para utilizar una base de datos de MariaDB comun entre todos los miembros del grupo, se han creado varios scripts que se emplean de la siguiente forma:
 
