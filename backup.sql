@@ -34,7 +34,7 @@ CREATE TABLE `entradas` (
   PRIMARY KEY (`id`),
   KEY `evento` (`evento`),
   CONSTRAINT `entradas_ibfk_1` FOREIGN KEY (`evento`) REFERENCES `eventos` (`nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,26 +44,16 @@ CREATE TABLE `entradas` (
 LOCK TABLES `entradas` WRITE;
 /*!40000 ALTER TABLE `entradas` DISABLE KEYS */;
 INSERT INTO `entradas` VALUES
-(19,'GENERAL','VENTAPRIMARIA',9,10,'hola',NULL),
-(20,'VIP','VENTAPRIMARIA',10,10,'hola',NULL),
-(21,'NUMERADA','VENTAPRIMARIA',10,10,'hola',NULL),
-(22,'GENERAL','VENTAPRIMARIA',100,30,'Concierto Rock 2025',NULL),
-(23,'VIP','VENTAPRIMARIA',20,60,'Concierto Rock 2025',NULL),
-(24,'NUMERADA','VENTAPRIMARIA',150,15,'Concierto Rock 2025',NULL),
-(25,'VIP','VENTASECUNDARIA',1,60,'Concierto Rock 2025',NULL),
-(26,'NUMERADA','VENTASECUNDARIA',1,21,'Concierto Rock 2025','i22pecum@uco.es'),
-(27,'GENERAL','VENTASECUNDARIA',1,42,'Concierto Rock 2025','i22pecum@uco.es'),
-(28,'NUMERADA','VENTASECUNDARIA',1,20,'Concierto Rock 2025','i22pecum@uco.es'),
-(29,'NUMERADA','VENTASECUNDARIA',1,20.3,'Concierto Rock 2025','i22pecum@uco.es'),
-(30,'GENERAL','VENTAPRIMARIA',9,10,'pene','organizador@gmail.com'),
-(31,'VIP','VENTAPRIMARIA',10,10,'pene','organizador@gmail.com'),
-(32,'NUMERADA','VENTAPRIMARIA',10,10,'pene','organizador@gmail.com'),
-(33,'GENERAL','VENTASECUNDARIA',1,2,'pene','i22pecum@uco.es'),
-(34,'GENERAL','VENTASECUNDARIA',1,12,'pene','i22pecum@uco.es'),
-(35,'GENERAL','VENTASECUNDARIA',1,12,'pene','i22pecum@uco.es'),
-(36,'GENERAL','VENTASECUNDARIA',1,8,'pene','i22pecum@uco.es'),
-(37,'GENERAL','VENTASECUNDARIA',1,1,'pene','i22pecum@uco.es'),
-(38,'GENERAL','VENTASECUNDARIA',1,3,'pene','i22pecum@uco.es');
+(1,'GENERAL','VENTAPRIMARIA',99,30,'Concierto Rock 2025','organizador@gmail.com'),
+(2,'VIP','VENTAPRIMARIA',40,60,'Concierto Rock 2025','organizador@gmail.com'),
+(3,'NUMERADA','VENTAPRIMARIA',149,40,'Concierto Rock 2025','organizador@gmail.com'),
+(4,'GENERAL','VENTAPRIMARIA',299,20,'Maratón Ciudad 2025','organizador@gmail.com'),
+(5,'VIP','VENTAPRIMARIA',50,40,'Maratón Ciudad 2025','organizador@gmail.com'),
+(6,'NUMERADA','VENTAPRIMARIA',100,25,'Maratón Ciudad 2025','organizador@gmail.com'),
+(7,'GENERAL','VENTAPRIMARIA',80,25,'Festival Jazz 2025','eventosplus@gmail.com'),
+(8,'VIP','VENTAPRIMARIA',30,50,'Festival Jazz 2025','eventosplus@gmail.com'),
+(9,'NUMERADA','VENTAPRIMARIA',70,35,'Festival Jazz 2025','eventosplus@gmail.com'),
+(10,'GENERAL','VENTASECUNDARIA',1,22,'Maraton Ciudad 2025','luis.martinez@gmail.com');
 /*!40000 ALTER TABLE `entradas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -83,7 +73,7 @@ CREATE TABLE `entradasVendidas` (
   KEY `correoUsuario` (`correoUsuario`),
   CONSTRAINT `entradasVendidas_ibfk_1` FOREIGN KEY (`idEntrada`) REFERENCES `entradas` (`id`),
   CONSTRAINT `entradasVendidas_ibfk_2` FOREIGN KEY (`correoUsuario`) REFERENCES `usuarios` (`correo`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,11 +83,10 @@ CREATE TABLE `entradasVendidas` (
 LOCK TABLES `entradasVendidas` WRITE;
 /*!40000 ALTER TABLE `entradasVendidas` DISABLE KEYS */;
 INSERT INTO `entradasVendidas` VALUES
-(4,22,'i22pecum@uco.es'),
-(5,23,'i22pecum@uco.es'),
-(6,24,'i22pecum@uco.es'),
-(7,19,'i22pecum@uco.es'),
-(8,38,'i22pecum@uco.es');
+(1,1,'i22pecum@uco.es'),
+(2,2,'i22pecum@uco.es'),
+(3,3,'ana.garcia@gmail.com'),
+(4,10,'luis.martinez@gmail.com');
 /*!40000 ALTER TABLE `entradasVendidas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,10 +117,9 @@ CREATE TABLE `eventos` (
 LOCK TABLES `eventos` WRITE;
 /*!40000 ALTER TABLE `eventos` DISABLE KEYS */;
 INSERT INTO `eventos` VALUES
-('Concierto Rock 2025','Gran concierto de bandas nacionales.','Madrid Arena','2025-06-15',1.5,'organizador@gmail.com'),
-('hola','adios','adios','3000-12-12',0.25,'organizador@gmail.com'),
-('Maratón Ciudad 2025','Carrera popular anual.','Parque del Retiro, Madrid','2025-09-10',1.2,'organizador@gmail.com'),
-('pene','pene','pene','2025-12-26',0.4,'organizador@gmail.com');
+('Concierto Rock 2025','Gran concierto de bandas nacionales.','Madrid Arena','2025-06-15',0.5,'organizador@gmail.com'),
+('Festival Jazz 2025','Festival internacional de jazz.','Teatro Real, Madrid','2025-07-20',0.4,'eventosplus@gmail.com'),
+('Maratón Ciudad 2025','Carrera popular anual.','Parque del Retiro, Madrid','2025-09-10',0.2,'organizador@gmail.com');
 /*!40000 ALTER TABLE `eventos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -158,7 +146,8 @@ CREATE TABLE `organizadores` (
 LOCK TABLES `organizadores` WRITE;
 /*!40000 ALTER TABLE `organizadores` DISABLE KEYS */;
 INSERT INTO `organizadores` VALUES
-('organizador@gmail.com','$2a$10$Tdzno1MvLb5wCtI/wem1VuuoNvZxLloe38dFOVuIZdyKKsA.AiBh6','Ejemplo',10);
+('eventosplus@gmail.com','$2a$10$sakdks23Jskddlsjdjkdjdd2ls93jdsl','Empresa dedicada a organización de eventos culturales.',0),
+('organizador@gmail.com','$2a$10$Tdzno1MvLb5wCtI/wem1VuuoNvZxLloe38dFOVuIZdyKKsA.AiBh6','Organizador de eventos musicales y deportivos.',125);
 /*!40000 ALTER TABLE `organizadores` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -180,7 +169,7 @@ CREATE TABLE `transacciones` (
   PRIMARY KEY (`id`),
   KEY `evento` (`evento`),
   CONSTRAINT `transacciones_ibfk_1` FOREIGN KEY (`evento`) REFERENCES `eventos` (`nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -190,7 +179,10 @@ CREATE TABLE `transacciones` (
 LOCK TABLES `transacciones` WRITE;
 /*!40000 ALTER TABLE `transacciones` DISABLE KEYS */;
 INSERT INTO `transacciones` VALUES
-(1,'VENTAPRIMARIA',10,'2025-05-19','i22pecum@uco.es','organizador@gmail.com','pene');
+(1,'VENTAPRIMARIA',30,'2025-05-10','i22pecum@uco.es','organizador@gmail.com','Concierto Rock 2025'),
+(2,'VENTAPRIMARIA',60,'2025-05-11','i22pecum@uco.es','organizador@gmail.com','Concierto Rock 2025'),
+(3,'VENTAPRIMARIA',15,'2025-05-12','ana.garcia@gmail.com','organizador@gmail.com','Concierto Rock 2025'),
+(4,'VENTAPRIMARIA',20,'2025-05-13','luis.martinez@gmail.com','organizador@gmail.com','Maratón Ciudad 2025');
 /*!40000 ALTER TABLE `transacciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -220,7 +212,9 @@ CREATE TABLE `usuarios` (
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
 INSERT INTO `usuarios` VALUES
-('i22pecum@uco.es','Manuel Peinado','$2a$10$Tdzno1MvLb5wCtI/wem1VuuoNvZxLloe38dFOVuIZdyKKsA.AiBh6',626394400,'31880419G',116);
+('ana.garcia@gmail.com','Ana García López','$2a$10$a7JkldmkePq9KM2FjsldOeIrXZjkQwzGJks1',654789321,'12345678A',50),
+('i22pecum@uco.es','Manuel Peinado','$2a$10$Tdzno1MvLb5wCtI/wem1VuuoNvZxLloe38dFOVuIZdyKKsA.AiBh6',626394400,'31880419G',25),
+('luis.martinez@gmail.com','Luis Martínez','$2a$10$sjdhfjKH8sjkdjsLJFlkslfJKslf9',698123456,'87654321B',10);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -233,4 +227,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-19 21:13:09
+-- Dump completed on 2025-05-20 15:14:32
