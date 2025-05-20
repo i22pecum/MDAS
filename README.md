@@ -42,6 +42,12 @@ Para instalar la base de datos y todos tener un mismo usuario dentro de esta par
 ```bash
 sudo ./instalar_bbdd.sh
 ```
+Si este script diera error a la hora de crear el usuario tendriamos que entrar a la BBDD y ejecutar el siguiente comando:
+```sql
+ALTER USER 'root'@'localhost' IDENTIFIED BY '1234';
+```
+Este comando nos cambiaria la contraseña del usuario root dentro de la base de datos a *1234*
+
 
 Para cargar los datos dentro de la base de datos habra que tener en el directorio actual el fichero backup.sql y hacer:
 ```bash
