@@ -52,6 +52,12 @@ public class TransaccionMgr {
         return entradas;
     }
 
+        /**
+     * Devuelve una lista de entradas asociadas a un usuario que **aún no han sido revendidas** y
+     * que pertenecen a eventos que todavía están disponibles (no han pasado).
+     * @param correo Correo del usuario del cual se quieren consultar las entradas.
+     * @return Lista de entradas válidas para publicar en reventa.
+     */
     public ArrayList<Entrada> verEntradasUsuarioSinReventa(String correo) {
         ArrayList<Entrada> entradas = new ArrayList<>();
         ArrayList<Integer> idEntradas = new ArrayList<>();

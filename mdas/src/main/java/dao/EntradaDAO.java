@@ -19,6 +19,11 @@ public class EntradaDAO {
         sqlProperties = new SQLProperties();
     }
 
+    /**
+     * Recupera los IDs de las entradas vendidas asociadas a un usuario.
+     * @param correo Correo del usuario.
+     * @return Lista de IDs de entradas.
+     */
     public ArrayList<Integer> getIdEntradasByCorreo(String correo) {
         ArrayList<Integer> entradas = new ArrayList<>();
         String sql = sqlProperties.getSQLQuery("ver_entradas_correo");
@@ -42,6 +47,11 @@ public class EntradaDAO {
         return entradas;
     }
 
+    /**
+     * Obtiene los IDs de todas las entradas registradas para un evento.
+     * @param nombreEvento Nombre del evento.
+     * @return Lista de IDs de entradas del evento.
+     */
     public ArrayList<Integer> getIdEntradasByEvento(String nombreEvento) {
         ArrayList<Integer> entradas = new ArrayList<>();
         String sql = sqlProperties.getSQLQuery("ver_identradas_evento");
@@ -65,6 +75,12 @@ public class EntradaDAO {
         return entradas;
     }
 
+    /**
+     * Recupera los objetos Entrada a partir de una lista de IDs.
+     * Incluye tipo, precio y nombre del evento.
+     * @param idEntradas Lista de IDs de entrada.
+     * @return Lista de objetos Entrada.
+     */
     public ArrayList<Entrada> getEntradasById(ArrayList<Integer> idEntradas) {
         ArrayList<Entrada> entradas = new ArrayList<>();
         String sql = sqlProperties.getSQLQuery("ver_entrada");
@@ -96,6 +112,12 @@ public class EntradaDAO {
         return entradas;
     }
 
+    /**
+     * Similar a getEntradasById, pero omite las entradas que ya han sido revendidas.
+     * Se usa para evitar reventas múltiples de la misma entrada.
+     * @param idEntradas Lista de IDs de entrada.
+     * @return Lista de objetos Entrada aún no revendidas.
+     */
     public ArrayList<Entrada> getEntradasByIdSinReventa(ArrayList<Integer> idEntradas) {
         ArrayList<Entrada> entradas = new ArrayList<>();
         String sql = sqlProperties.getSQLQuery("ver_entrada_sin_reventa");

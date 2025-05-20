@@ -14,6 +14,12 @@ public class EventoDAO {
         sqlProperties = new SQLProperties();
     }
 
+    /**
+     * Inserta un nuevo evento en la base de datos.
+     * Se introducen los campos del evento: nombre, descripción, lugar, fecha, límite de reventa y correo del organizador.
+     * @param evento Objeto Evento con todos los datos necesarios.
+     * @return true si el evento fue insertado correctamente, false si ocurrió algún error.
+     */
     public Boolean insertarEvento(Evento evento) {
         Boolean publicado = false;
         DBConnection dbConnection = new DBConnection();
@@ -46,6 +52,11 @@ public class EventoDAO {
         return publicado;
     }
 
+    /**
+     * Elimina un evento de la base de datos a partir de su nombre.
+     * @param nombreEvento Nombre del evento que se desea cancelar.
+     * @return true si el evento fue eliminado, false si ocurrió un error.
+     */
     public Boolean cancelarEvento(String nombreEvento) {
         Boolean cancelado = false;
         DBConnection dbConnection = new DBConnection();
@@ -73,6 +84,12 @@ public class EventoDAO {
         return cancelado;
     }
 
+    /**
+     * Modifica los datos de un evento ya existente.
+     * Actualiza la descripción, lugar, fecha y límite de reventa de un evento identificado por su nombre.
+     * @param evento Objeto Evento con los nuevos datos.
+     * @return true si la modificación fue exitosa, false si falló.
+     */
     public Boolean modificarEvento(Evento evento) {
         Boolean modificado = false;
         DBConnection dbConnection = new DBConnection();
@@ -105,6 +122,12 @@ public class EventoDAO {
         return modificado;
     }
 
+    /**
+     * Devuelve una lista de eventos publicados por un organizador.
+     * Se filtra por el correo del organizador y por eventos cuya fecha sea igual o posterior a hoy.
+     * @param correoOrganizador Correo del organizador que publicó los eventos.
+     * @return Lista de objetos Evento publicados por el organizador.
+     */
     public ArrayList<Evento> verEventosOrganizador(String correoOrganizador) {
         ArrayList<Evento> eventos = new ArrayList<>();
         DBConnection dbConnection = new DBConnection();
@@ -139,6 +162,12 @@ public class EventoDAO {
         return eventos;
     }
 
+    /**
+     * Devuelve una lista de eventos publicados por un organizador.
+     * Se filtra por el correo del organizador y por eventos cuya fecha sea igual o posterior a hoy.
+     * @param correoOrganizador Correo del organizador que publicó los eventos.
+     * @return Lista de objetos Evento publicados por el organizador.
+     */
     public ArrayList<Evento> listarEventosDisponibles() {
         ArrayList<Evento> eventos = new ArrayList<>();
         DBConnection dbConnection = new DBConnection();
@@ -171,6 +200,12 @@ public class EventoDAO {
         return eventos;
     }
 
+    /**
+     * Consulta el límite de reventa asignado a un evento determinado.
+     * Este límite se utiliza para calcular el precio máximo permitido en una reventa.
+     * @param nombreEventoAsociado Nombre del evento del que se quiere conocer el límite.
+     * @return Valor float entre 0 y 1 representando el porcentaje límite de reventa.
+     */
     public float consultarLimiteReventa(String nombreEventoAsociado) {
         float limite = 0.1f;
         DBConnection dbConnection = new DBConnection();
@@ -209,6 +244,11 @@ public class EventoDAO {
         return limite;
     }
 
+    /**
+     * Lista todos los eventos disponibles para compra (este sin filtrar por fecha).
+     * Se utiliza generalmente para mostrar opciones al usuario en el proceso de compra de entradas.
+     * @return Lista completa de eventos registrados.
+     */
     public ArrayList<Evento> listarEventosComprar() {
         ArrayList<Evento> eventos = new ArrayList<>();
         DBConnection dbConnection = new DBConnection();
