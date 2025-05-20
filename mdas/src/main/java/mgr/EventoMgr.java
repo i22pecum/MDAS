@@ -8,8 +8,9 @@ import dao.EventoDAO;
 import dao.EntradaDAO;
 
 
-//Clase que gestiona la lógica de negocio relacionada con eventos.
-
+/**
+ * Clase que gestiona la lógica de negocio relacionada con eventos.
+ */
 public class EventoMgr {
 
     private static EventoMgr instance;
@@ -66,6 +67,7 @@ public class EventoMgr {
     /**
      * Devuelve una lista de eventos disponibles (activos y no pasados).
      * Se usa para mostrar al usuario eventos en los que puede comprar entradas.
+     * @return Lista de eventos disponibles.
      */
     public ArrayList<Evento> listarEventosDisponibles() {
         EventoDAO eventoDAO = new EventoDAO();
@@ -82,22 +84,11 @@ public class EventoMgr {
         return eventoDAO.verEventosOrganizador(correo);
     }
 
-
-    /**
-     * Lista los eventos que tienen entradas disponibles para compra.
-     * Equivalente a los eventos "activos".
-     */
-    public ArrayList<Evento> listarEventosComprar() {
-        EventoDAO eventoDAO = new EventoDAO();
-        return eventoDAO.listarEventosComprar();
-    }
-
-
     /**
      * Consulta el límite de reventa permitido para un evento.
-     * Este valor se usa para validar si el precio de reventa está permitido.
+     * 
      * @param nombreEvento Nombre del evento.
-     * @return Límite de reventa como float (por ejemplo, 1.5 para 150% del precio).
+     * @return Límite de reventa como float.
      */
     public float getLimiteReventaEvento(String nombreEvento) {
         EventoDAO eventoDAO = new EventoDAO();

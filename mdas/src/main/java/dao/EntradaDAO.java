@@ -113,8 +113,7 @@ public class EntradaDAO {
     }
 
     /**
-     * Similar a getEntradasById, pero omite las entradas que ya han sido revendidas.
-     * Se usa para evitar reventas múltiples de la misma entrada.
+     * Similar a getEntradasById, pero omite las entradas que ya han sido puestas en reventa.
      * @param idEntradas Lista de IDs de entrada.
      * @return Lista de objetos Entrada aún no revendidas.
      */
@@ -149,6 +148,11 @@ public class EntradaDAO {
         return entradas;
     }
 
+    /**
+     * Elimina todas las entradas vendidas de la base de datos.
+     * @param idEntradas Lista de IDs de entradas a eliminar.
+     * @return true si se eliminaron correctamente, false en caso contrario.
+     */
     public Boolean eliminarEntradasVendidasByIdEntrada(ArrayList<Integer> idEntradas) {
         Boolean eliminado = false;
         String sql = sqlProperties.getSQLQuery("eliminar_entradas_vendidas");
@@ -175,6 +179,11 @@ public class EntradaDAO {
         return eliminado;
     }
 
+    /**
+     * Elimina todas las entradas de un evento específico.
+     * @param nombreEvento Nombre del evento cuyas entradas se desean eliminar.
+     * @return true si se eliminaron correctamente, false en caso contrario.
+     */
     public Boolean eliminarEntradasByNombreEvento(String nombreEvento) {
         Boolean eliminado = false;
         String sql = sqlProperties.getSQLQuery("eliminar_entradas_evento");
@@ -200,6 +209,11 @@ public class EntradaDAO {
         return eliminado;
     }
 
+    /**
+     * Inserta una nueva entrada en la base de datos.
+     * @param entrada Objeto Entrada con los datos a insertar.
+     * @return true si la entrada se insertó correctamente, false en caso contrario.
+     */
     public boolean insertarEntrada(Entrada entrada) {
         DBConnection dbConnection = new DBConnection();
         PreparedStatement preparedStatement = null;
@@ -241,132 +255,11 @@ public class EntradaDAO {
         return publicada;
     }
 
-    public boolean comprarEntrada(String correoUsuario, String nombreEvento, TipoEntrada tipoEntrada) {
-        DBConnection dbConnection = new DBConnection();
-        Connection conn = null;
-        PreparedStatement psSelectEntrada = null;
-        PreparedStatement psSelectUsuario = null;
-        PreparedStatement psUpdateEntrada = null;
-        PreparedStatement psInsertVendida = null;
-        PreparedStatement psUpdateMonedero = null;
-        PreparedStatement psInsertTransaccion = null;
-        ResultSet rsEntrada = null;
-        ResultSet rsUsuario = null;
-
-        try {
-            conn = dbConnection.getConnection();
-            conn.setAutoCommit(false); 
-
-            String sqlEntrada = "SELECT precio, cantidad AS disponibles FROM entradas WHERE nombreEvento = ? AND tipo = ? FOR UPDATE";
-            psSelectEntrada = conn.prepareStatement(sqlEntrada);
-            psSelectEntrada.setString(1, nombreEvento);
-            psSelectEntrada.setString(2, tipoEntrada.name());
-            rsEntrada = psSelectEntrada.executeQuery();
-
-            if (!rsEntrada.next()) {
-                conn.rollback();
-                return false; 
-            }
-
-            float precio = rsEntrada.getFloat("precio");
-            int disponibles = rsEntrada.getInt("disponibles");
-
-            if (disponibles <= 0) {
-                conn.rollback();
-                return false; 
-            }
-
-           
-            String sqlUsuario = "SELECT monedero FROM usuarios WHERE correo = ? FOR UPDATE";
-            psSelectUsuario = conn.prepareStatement(sqlUsuario);
-            psSelectUsuario.setString(1, correoUsuario);
-            rsUsuario = psSelectUsuario.executeQuery();
-
-            if (!rsUsuario.next()) {
-                conn.rollback();
-                return false; 
-            }
-
-            float saldo = rsUsuario.getFloat("monedero");
-            if (saldo < precio) {
-                conn.rollback();
-                return false; 
-            }
-
-           
-            String sqlUpdateEntrada = "UPDATE entradas SET cantidad = cantidad - 1 WHERE nombreEvento = ? AND tipo = ?";
-            psUpdateEntrada = conn.prepareStatement(sqlUpdateEntrada);
-            psUpdateEntrada.setString(1, nombreEvento);
-            psUpdateEntrada.setString(2, tipoEntrada.name());
-            psUpdateEntrada.executeUpdate();
-
-        
-            String sqlInsertVendida = "INSERT INTO entradasVendidas (nombreEvento, tipo, correoUsuario) VALUES (?, ?, ?)";
-            psInsertVendida = conn.prepareStatement(sqlInsertVendida);
-            psInsertVendida.setString(1, nombreEvento);
-            psInsertVendida.setString(2, tipoEntrada.name());
-            psInsertVendida.setString(3, correoUsuario);
-            psInsertVendida.executeUpdate();
-
-           
-            String sqlUpdateMonedero = "UPDATE usuarios SET monedero = monedero - ? WHERE correo = ?";
-            psUpdateMonedero = conn.prepareStatement(sqlUpdateMonedero);
-            psUpdateMonedero.setFloat(1, precio);
-            psUpdateMonedero.setString(2, correoUsuario);
-            psUpdateMonedero.executeUpdate();
-
-          
-            String sqlInsertTransaccion = "INSERT INTO transacciones (tipo, importe, fecha, comprador, vendedor) VALUES (?, ?, ?, ?, ?)";
-            psInsertTransaccion = conn.prepareStatement(sqlInsertTransaccion);
-            psInsertTransaccion.setString(1, "VENTAPRIMARIA");
-            psInsertTransaccion.setFloat(2, precio);
-            psInsertTransaccion.setDate(3, new java.sql.Date(System.currentTimeMillis()));
-            psInsertTransaccion.setString(4, correoUsuario);
-            psInsertTransaccion.setString(5, "ORGANIZADOR"); 
-
-            psInsertTransaccion.executeUpdate();
-
-            conn.commit();
-            return true;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            try {
-                if (conn != null)
-                    conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            return false;
-
-        } finally {
-            try {
-                if (rsEntrada != null)
-                    rsEntrada.close();
-                if (rsUsuario != null)
-                    rsUsuario.close();
-                if (psSelectEntrada != null)
-                    psSelectEntrada.close();
-                if (psSelectUsuario != null)
-                    psSelectUsuario.close();
-                if (psUpdateEntrada != null)
-                    psUpdateEntrada.close();
-                if (psInsertVendida != null)
-                    psInsertVendida.close();
-                if (psUpdateMonedero != null)
-                    psUpdateMonedero.close();
-                if (psInsertTransaccion != null)
-                    psInsertTransaccion.close();
-                if (conn != null) {
-                    conn.setAutoCommit(true); 
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
+    /**
+     * Inserta una entrada de reventa en la base de datos.
+     * @param entrada Objeto Entrada con los datos a insertar.
+     * @return ID de la reventa insertada, o 0 si hubo error.
+     */
     public int insertarReventa(Entrada entrada) {
         DBConnection dbConnection = new DBConnection();
         PreparedStatement preparedStatement = null;
@@ -408,6 +301,12 @@ public class EntradaDAO {
         return idReventa;
     }
 
+    /**
+     * Actualiza el ID de una entrada en la base de datos.
+     * @param idEntradaOriginal ID de la entrada original.
+     * @param idReventa Nuevo ID de reventa.
+     * @return true si se actualizó correctamente, false en caso contrario.
+     */
     public boolean actualizarId(int idEntradaOriginal, int idReventa) {
         DBConnection dbConnection = new DBConnection();
         PreparedStatement preparedStatement = null;
@@ -440,33 +339,33 @@ public class EntradaDAO {
         return actualizado;
     }
 
-
-
+    /**
+     * Recupera las entradas disponibles de un tipo de venta especifico para un evento específico.
+     * @param nombreEvento Nombre del evento.
+     * @param tipoTransaccion Tipo de transacción (venta primaria o secundaria).
+     * @return Lista de entradas disponibles.
+     */
     public ArrayList<Entrada> getEntradasDisponiblesByNombreEvento(String nombreEvento,
             TipoTransaccion tipoTransaccion) {
         ArrayList<Entrada> entradas = new ArrayList<>();
         DBConnection dbConnection = new DBConnection();
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
+        String sql = sqlProperties.getSQLQuery("ver_entradas_disponibles_evento");
 
         try {
             Connection connection = dbConnection.getConnection();
-            String sql = "SELECT id, tipo, precio, correoVendedor FROM entradas WHERE evento = ? AND tipoVenta = ? AND disponibles > 0";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, nombreEvento);
             preparedStatement.setString(2, tipoTransaccion.name());
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Entrada entrada = new Entrada();
-
-
-                entrada.setId(resultSet.getInt("id"));
-                String tipoStr = resultSet.getString("tipo");
-                entrada.setTipo(TipoEntrada.valueOf(tipoStr));
-                entrada.setPrecio(resultSet.getFloat("precio"));
-                entrada.setCorreoVendedor(resultSet.getString("correoVendedor"));
-                entrada.setNombreEvento(nombreEvento);
+                int id = resultSet.getInt("id");
+                TipoEntrada tipo = TipoEntrada.valueOf(resultSet.getString("tipo"));
+                float precio = resultSet.getFloat("precio");
+                String correoVendedor = resultSet.getString("correoVendedor");
+                Entrada entrada = EntradaFactory.createEntradaConId(id, tipo, precio, nombreEvento, correoVendedor);
 
                 entradas.add(entrada);
             }
@@ -488,6 +387,11 @@ public class EntradaDAO {
         return entradas;
     }
 
+    /**
+     * Disminuye la cantidad de entradas disponibles en la base de datos.
+     * @param idEntrada ID de la entrada a disminuir.
+     * @return true si se disminuyó correctamente, false en caso contrario.
+     */
     public boolean disminuirCantidadEntrada(int idEntrada) {
         DBConnection dbConnection = new DBConnection();
         Connection conn = null;
@@ -496,8 +400,8 @@ public class EntradaDAO {
         try {
             conn = dbConnection.getConnection();
 
-            String sqlUpdateEntrada = "UPDATE entradas SET disponibles = disponibles - 1 WHERE id = ?";
-            psUpdateEntrada = conn.prepareStatement(sqlUpdateEntrada);
+            String sql = sqlProperties.getSQLQuery("disminuir_cantidad_entrada");
+            psUpdateEntrada = conn.prepareStatement(sql);
             psUpdateEntrada.setInt(1, idEntrada);
             int filasAfectadas = psUpdateEntrada.executeUpdate();
             return filasAfectadas > 0;
@@ -516,6 +420,12 @@ public class EntradaDAO {
         }
     }
 
+    /**
+     * Inserta una entrada vendida en la base de datos.
+     * @param idEntrada ID de la entrada vendida.
+     * @param correoUsuario Correo del usuario que compró la entrada.
+     * @return true si se insertó correctamente, false en caso contrario.
+     */
     public boolean insertarEntradaVendida(int idEntrada, String correoUsuario) {
         DBConnection dbConnection = new DBConnection();
         Connection connection = null;

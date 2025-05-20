@@ -16,13 +16,6 @@ public class Entrada {
         this.nombreEvento = nombreEvento;
     }
 
-    public Entrada(TipoEntrada tipo, float precio, String nombreEvento, int cantidad) {
-        this.tipo = tipo;
-        this.precio = precio;
-        this.nombreEvento = nombreEvento;
-        this.cantidad = cantidad;
-    }
-
     public Entrada(TipoEntrada tipo, float precio, String nombreEvento, String correoVendedor) {
         this.tipo = tipo;
         this.precio = precio;
@@ -38,15 +31,15 @@ public class Entrada {
         this.correoVendedor = correoVendedor;
     }
 
-    public Entrada() {
-    }
-
     public Entrada(int id, TipoEntrada tipo, float precio, String nombreEvento, String correoVendedor) {
         this.id = id;
         this.tipo = tipo;
         this.precio = precio;
         this.nombreEvento = nombreEvento;
         this.correoVendedor = correoVendedor;
+    }
+
+    public Entrada() {
     }
 
     public int getId() {

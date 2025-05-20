@@ -6,8 +6,9 @@ import dao.OrganizadorDAO;
 import dao.UsuarioDAO;
 
 
-//Clase que gestiona la lógica de negocio relacionada con usuarios y organizadores.
-
+/**
+ * Clase que gestiona la lógica de negocio relacionada con usuarios y organizadores.
+ */
 public class UsuarioMgr {
     
     private static UsuarioMgr instance;
@@ -27,7 +28,7 @@ public class UsuarioMgr {
     * @param usuario Objeto Usuario con los datos del nuevo registro.
     * @return true si se registró correctamente, false en caso contrario.
     */
-    public Boolean Registrarse(Usuario usuario) {
+    public Boolean registrarse(Usuario usuario) {
         Boolean registrado = false;
         UsuarioDAO usuarioDAO = new UsuarioDAO();
 
@@ -38,11 +39,11 @@ public class UsuarioMgr {
 
 
     /**
-     * Verifica las credenciales de un usuario normal al iniciar sesión.
+     * Verifica las credenciales de un usuario al iniciar sesión.
      * @param usuario Objeto Usuario con correo y contraseña.
      * @return true si las credenciales son válidas, false si no coinciden.
      */
-    public Boolean IniciarSesionUsuario(Usuario usuario) {
+    public Boolean iniciarSesionUsuario(Usuario usuario) {
         Boolean permitirAcceso = false;
         UsuarioDAO usuarioDAO = new UsuarioDAO();
 
@@ -56,7 +57,7 @@ public class UsuarioMgr {
      * @param organizador Objeto Organizador con correo y contraseña.
      * @return true si las credenciales son válidas, false si no coinciden.
      */
-    public Boolean IniciarSesionOrganizador(Organizador organizador) {
+    public Boolean iniciarSesionOrganizador(Organizador organizador) {
         Boolean permitirAcceso = false;
         OrganizadorDAO OrganizadorDAO = new OrganizadorDAO();
 

@@ -1,11 +1,13 @@
 package mgr;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import dao.*;
 import dto.*;
 
-//Clase que gestiona la lógica de negocio relacionada con transacciones
-
+/**
+ * Clase que gestiona la lógica de negocio relacionada con transacciones y entradas.
+ */
 public class TransaccionMgr {
 
     private static TransaccionMgr instance;
@@ -21,7 +23,7 @@ public class TransaccionMgr {
     }
 
     /**
-     * Devuelve una lista de entradas del usuario que aún se pueden revender (es decir, entradas asociadas a eventos futuros).
+     * Devuelve una lista de todas las entradas del usuario.
      * @param correo Correo del usuario
      * @return Lista de entradas válidas para reventa
      */
@@ -43,20 +45,21 @@ public class TransaccionMgr {
             nombreEventos.add(evento.getNombre());
         }
 
-        for (Entrada entrada : entradas) {
-            if (nombreEventos.contains(entrada.getNombreEvento()) == false) {
-                entradas.remove(entrada);
+        Iterator<Entrada> iterator = entradas.iterator();
+        while (iterator.hasNext()) {
+            Entrada entrada = iterator.next();
+            if (!nombreEventos.contains(entrada.getNombreEvento())) {
+                iterator.remove();
             }
         }
 
         return entradas;
     }
 
-        /**
-     * Devuelve una lista de entradas asociadas a un usuario que **aún no han sido revendidas** y
-     * que pertenecen a eventos que todavía están disponibles (no han pasado).
-     * @param correo Correo del usuario del cual se quieren consultar las entradas.
-     * @return Lista de entradas válidas para publicar en reventa.
+    /**
+     * Devuelve una lista de todas las entradas del usuario, menos aquellas que ha puesto en reventa.
+     * @param correo Correo del usuario
+     * @return Lista de entradas válidas para reventa
      */
     public ArrayList<Entrada> verEntradasUsuarioSinReventa(String correo) {
         ArrayList<Entrada> entradas = new ArrayList<>();
@@ -76,9 +79,11 @@ public class TransaccionMgr {
             nombreEventos.add(evento.getNombre());
         }
 
-        for (Entrada entrada : entradas) {
-            if (nombreEventos.contains(entrada.getNombreEvento()) == false) {
-                entradas.remove(entrada);
+        Iterator<Entrada> iterator = entradas.iterator();
+        while (iterator.hasNext()) {
+            Entrada entrada = iterator.next();
+            if (!nombreEventos.contains(entrada.getNombreEvento())) {
+                iterator.remove();
             }
         }
 
@@ -120,21 +125,22 @@ public class TransaccionMgr {
 
 
     /**
-     * Elimina las entradas asociadas a un evento (tanto en entradas vendidas como en disponibles).
+     * Elimina las entradas asociadas a un evento (tanto las entradas vendidas como las disponibles).
      * @param nombreEvento Nombre del evento
      * @return true si se eliminaron correctamente
      */
     public Boolean eliminarEntradas(String nombreEvento) {
         EntradaDAO entradaDAO = new EntradaDAO();
         ArrayList<Integer> idEntradas = new ArrayList<>();
+        Boolean eliminado = false;
 
         idEntradas = entradaDAO.getIdEntradasByEvento(nombreEvento);
 
-        entradaDAO.eliminarEntradasVendidasByIdEntrada(idEntradas);
+        eliminado = entradaDAO.eliminarEntradasVendidasByIdEntrada(idEntradas);
 
-        entradaDAO.eliminarEntradasByNombreEvento(nombreEvento);
+        eliminado = entradaDAO.eliminarEntradasByNombreEvento(nombreEvento);
 
-        return true;
+        return eliminado;
     }
 
 
@@ -186,26 +192,27 @@ public class TransaccionMgr {
         TransaccionDAO transaccionDAO = new TransaccionDAO();
         OrganizadorDAO organizadorDAO = new OrganizadorDAO();
         ArrayList<Integer> idEntradas = new ArrayList<>();
+        Boolean comprado = false;
         idEntradas.add(entrada.getId());
 
         
-        entradaDAO.disminuirCantidadEntrada(entrada.getId());
+        comprado = entradaDAO.disminuirCantidadEntrada(entrada.getId());
 
-        usuarioDAO.restarMonedero(correoUsuario, entrada.getPrecio());
+        comprado = usuarioDAO.restarMonedero(correoUsuario, entrada.getPrecio());
         
         if (tipoTransaccion.equals(TipoTransaccion.VENTASECUNDARIA) == true) {
-            usuarioDAO.recargarMonedero(entrada.getCorreoVendedor(), entrada.getPrecio());
-            entradaDAO.eliminarEntradasVendidasByIdEntrada(idEntradas);
+            comprado = usuarioDAO.recargarMonedero(entrada.getCorreoVendedor(), entrada.getPrecio());
+            comprado = entradaDAO.eliminarEntradasVendidasByIdEntrada(idEntradas);
         } else {
             
-            organizadorDAO.recargarMonedero(entrada.getCorreoVendedor(), entrada.getPrecio());
+            comprado = organizadorDAO.recargarMonedero(entrada.getCorreoVendedor(), entrada.getPrecio());
         }
 
-        entradaDAO.insertarEntradaVendida(entrada.getId(), correoUsuario);
+        comprado = entradaDAO.insertarEntradaVendida(entrada.getId(), correoUsuario);
         
-        transaccionDAO.insertarTransaccion(transaccion, entrada.getNombreEvento());
+        comprado = transaccionDAO.insertarTransaccion(transaccion, entrada.getNombreEvento());
         
-        return true;
+        return comprado;
     }
 
 }

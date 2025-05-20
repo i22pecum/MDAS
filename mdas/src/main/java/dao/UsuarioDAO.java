@@ -6,6 +6,9 @@ import dto.Usuario;
 import java.sql.*;
 import org.mindrot.jbcrypt.BCrypt;
 
+/**
+ * Clase que gestiona la persistencia de los usuarios en la base de datos.
+ */
 public class UsuarioDAO {
     
     private SQLProperties sqlProperties;
@@ -88,6 +91,12 @@ public class UsuarioDAO {
         return permitirAcceso;
     }
 
+    /**
+     * Actualiza el saldo del monedero del usuario.
+     * @param correo Correo del usuario a actualizar.
+     * @param cantidad Cantidad a agregar al monedero.
+     * @return true si se actualizó correctamente, false si falló.
+     */
     public boolean recargarMonedero(String correo, float cantidad) {
         DBConnection dbConnection = new DBConnection();
         boolean exito = false;
@@ -111,6 +120,12 @@ public class UsuarioDAO {
         return exito;
     }
 
+    /**
+     * Resta una cantidad del monedero del usuario.
+     * @param correo Correo del usuario a actualizar.
+     * @param cantidad Cantidad a restar del monedero.
+     * @return true si se actualizó correctamente, false si falló.
+     */
     public boolean restarMonedero(String correo, float cantidad) {
         DBConnection dbConnection = new DBConnection();
         boolean exito = false;
@@ -134,30 +149,35 @@ public class UsuarioDAO {
         return exito;
     }
 
+    /**
+     * Consulta el saldo actual del monedero de un usuario.
+     * @param correo Correo del usuario.
+     * @return Saldo actual como float.
+     */
     public float consultarMonedero(String correo) {
-    DBConnection dbConnection = new DBConnection();
-    float saldo = 0.0f;
-    String sql;
+        DBConnection dbConnection = new DBConnection();
+        float saldo = 0.0f;
+        String sql = sqlProperties.getSQLQuery("consultar_monedero");
 
-    try {
-        Connection conn = dbConnection.getConnection();
-        sql = "SELECT monedero FROM usuarios WHERE correo = ?";
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, correo);
+        try {
+            Connection conn = dbConnection.getConnection();
+            sql = sqlProperties.getSQLQuery("consultar_monedero");
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, correo);
 
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            saldo = rs.getFloat("monedero");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                saldo = rs.getFloat("monedero");
+            }
+
+            rs.close();
+            ps.close();
+            dbConnection.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        rs.close();
-        ps.close();
-        dbConnection.closeConnection();
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-
-        return saldo;
+            return saldo;
     }
 
 

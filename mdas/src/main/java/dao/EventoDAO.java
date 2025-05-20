@@ -6,6 +6,9 @@ import dto.Evento;
 import java.sql.*;
 import java.util.ArrayList;
 
+/**
+ * Clase que gestiona la persistencia de los eventos en la base de datos.
+ */
 public class EventoDAO {
 
     private SQLProperties sqlProperties;
@@ -16,7 +19,6 @@ public class EventoDAO {
 
     /**
      * Inserta un nuevo evento en la base de datos.
-     * Se introducen los campos del evento: nombre, descripción, lugar, fecha, límite de reventa y correo del organizador.
      * @param evento Objeto Evento con todos los datos necesarios.
      * @return true si el evento fue insertado correctamente, false si ocurrió algún error.
      */
@@ -86,7 +88,6 @@ public class EventoDAO {
 
     /**
      * Modifica los datos de un evento ya existente.
-     * Actualiza la descripción, lugar, fecha y límite de reventa de un evento identificado por su nombre.
      * @param evento Objeto Evento con los nuevos datos.
      * @return true si la modificación fue exitosa, false si falló.
      */
@@ -124,7 +125,6 @@ public class EventoDAO {
 
     /**
      * Devuelve una lista de eventos publicados por un organizador.
-     * Se filtra por el correo del organizador y por eventos cuya fecha sea igual o posterior a hoy.
      * @param correoOrganizador Correo del organizador que publicó los eventos.
      * @return Lista de objetos Evento publicados por el organizador.
      */
@@ -202,7 +202,6 @@ public class EventoDAO {
 
     /**
      * Consulta el límite de reventa asignado a un evento determinado.
-     * Este límite se utiliza para calcular el precio máximo permitido en una reventa.
      * @param nombreEventoAsociado Nombre del evento del que se quiere conocer el límite.
      * @return Valor float entre 0 y 1 representando el porcentaje límite de reventa.
      */
@@ -242,50 +241,6 @@ public class EventoDAO {
         }
 
         return limite;
-    }
-
-    /**
-     * Lista todos los eventos disponibles para compra (este sin filtrar por fecha).
-     * Se utiliza generalmente para mostrar opciones al usuario en el proceso de compra de entradas.
-     * @return Lista completa de eventos registrados.
-     */
-    public ArrayList<Evento> listarEventosComprar() {
-        ArrayList<Evento> eventos = new ArrayList<>();
-        DBConnection dbConnection = new DBConnection();
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-
-        try {
-            Connection connection = dbConnection.getConnection();
-            String sql = "SELECT nombre, descripcion, ubicacion, fecha, limiteReventa FROM eventos";
-            preparedStatement = connection.prepareStatement(sql);
-            resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                Evento evento = new Evento();
-                evento.setNombre(resultSet.getString("nombre"));
-                evento.setDescripcion(resultSet.getString("descripcion"));
-                evento.setLugar(resultSet.getString("ubicacion"));
-                evento.setFecha(resultSet.getDate("fecha"));
-                evento.setLimiteReventa(resultSet.getFloat("limiteReventa"));
-                eventos.add(evento);
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error al listar eventos: " + e.getMessage());
-        } finally {
-            try {
-                if (resultSet != null)
-                    resultSet.close();
-                if (preparedStatement != null)
-                    preparedStatement.close();
-                dbConnection.closeConnection();
-            } catch (SQLException e) {
-                System.out.println("Error cerrando recursos: " + e.getMessage());
-            }
-        }
-
-        return eventos;
     }
 
 }

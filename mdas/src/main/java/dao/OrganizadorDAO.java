@@ -6,6 +6,9 @@ import dto.Organizador;
 import java.sql.*;
 import org.mindrot.jbcrypt.BCrypt;
 
+/**
+ * Clase que gestiona la persistencia de los organizadores en la base de datos.
+ */
 public class OrganizadorDAO {
 
     private SQLProperties sqlProperties;
@@ -52,7 +55,6 @@ public class OrganizadorDAO {
 
     /**
      * Recarga saldo en el monedero del organizador.
-     * Aumenta el valor del campo 'monedero' para el organizador identificado por el correo.
      * @param correo Correo del organizador cuyo monedero se va a recargar.
      * @param cantidad Cantidad positiva a añadir al monedero.
      * @return true si la actualización en la base de datos fue exitosa, false en caso de error.
@@ -82,7 +84,6 @@ public class OrganizadorDAO {
 
     /**
      * Resta saldo del monedero del organizador.
-     * Disminuye el valor del campo 'monedero' del organizador especificado, por ejemplo, en devoluciones.
      * @param correo Correo del organizador al que se le descontará saldo.
      * @param cantidad Cantidad a restar (debe ser positiva y menor o igual al saldo actual).
      * @return true si se realizó el descuento correctamente, false en caso de error o fallo en la base de datos.

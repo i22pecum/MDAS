@@ -2,18 +2,23 @@ package main;
 
 import java.util.ArrayList;
 
+import org.checkerframework.checker.units.qual.A;
+
 import dto.*;
 import mgr.*;
 
-/* Clase utilizada para almacenar el estado completo de la aplicación:
-* incluye los usuarios registrados, las sesiones disponibles y las entradas.
-* Esta clase se serializa para guardar y recuperar el estado al cerrar o iniciar la aplicación.
-*/
+/**
+ * Clase principal de la aplicación que gestiona la interacción con el usuario y las operaciones
+ * relacionadas con el registro, inicio de sesión y gestión de eventos.
+ */
 public class App {
-    /* Función principal de la aplicación.
-    * Muestra un menú interactivo
-    * El registro solicita al usuario sus datos personales y llama al método correspondiente del gestor de usuarios.
-    */
+
+    /**
+     * Método principal que inicia la aplicación y muestra el menú de opciones al usuario.
+     * Permite registrarse, iniciar sesión o salir de la aplicación.
+     *
+     * @param args Argumentos de línea de comandos (no utilizados).
+     */
     public static void main(String[] args) {
         int opc;
         UsuarioMgr usuarioMgr = UsuarioMgr.getInstance();
@@ -47,7 +52,7 @@ public class App {
                     usuario.setDni(aux.Scanf.scanDni());
 
                     App.clearConsole();
-                    if (usuarioMgr.Registrarse(usuario) == true) {
+                    if (usuarioMgr.registrarse(usuario) == true) {
                         System.out.println("\nUsuario registrado correctamente");
                     } else {
                         System.out.println("\nError al registrar el usuario");
@@ -66,9 +71,9 @@ public class App {
     }
 
     /**
-     * Muestra la interfaz de inicio de sesión para el usuario o el organizador.
-     * Permite seleccionar el tipo de inicio de sesión, introducir credenciales
-     * y acceder a la interfaz correspondiente si las credenciales son válidas.
+     * Muestra un menú para iniciar sesión como organizador o usuario y gestiona las credenciales
+     * de inicio de sesión. Si las credenciales son correctas, redirige al usuario a la interfaz
+     * correspondiente.
      */
     public static void interfazIniciarSesion() {
         int opcIS;
@@ -96,7 +101,7 @@ public class App {
                     organizador.setContrasena(aux.Scanf.scanString());
 
                     App.clearConsole();
-                    if (usuarioMgr.IniciarSesionOrganizador(organizador) == true) {
+                    if (usuarioMgr.iniciarSesionOrganizador(organizador) == true) {
                         System.out.println("\nIniciando sesion como Organizador");
                         interfazOrganizador(organizador.getCorreo());
                     } else {
@@ -110,7 +115,7 @@ public class App {
                     usuario.setContrasena(aux.Scanf.scanString());
 
                     App.clearConsole();
-                    if (usuarioMgr.IniciarSesionUsuario(usuario) == true) {
+                    if (usuarioMgr.iniciarSesionUsuario(usuario) == true) {
                         System.out.println("\nIniciando sesion como Usuario");
                         interfazUsuario(usuario.getCorreo());
                     } else {
@@ -146,6 +151,7 @@ public class App {
         ArrayList<Entrada> entradas = new ArrayList<Entrada>();
         Entrada entradaCompra = new Entrada();
         ArrayList<Evento> eventosDisponibles = new ArrayList<Evento>();
+        ArrayList<String> nombreEventos = new ArrayList<String>();
 
         do {
             System.out.println("\nSelecciona la acción que desees realizar:" +
@@ -168,12 +174,13 @@ public class App {
                 case 1:
 
                     System.out.println("\nEventos disponibles:");
-                    ArrayList<Evento> listarEventosDisponibles = eventoMgr.listarEventosComprar();
+                    eventosDisponibles = eventoMgr.listarEventosDisponibles();
 
-                    if (listarEventosDisponibles.isEmpty()) {
+                    if (eventosDisponibles.isEmpty()) {
                         System.out.println("No hay eventos disponibles.");
                     } else {
-                        for (Evento evento : listarEventosDisponibles) {
+                        for (Evento evento : eventosDisponibles) {
+                            nombreEventos.add(evento.getNombre());
                             System.out.println("Nombre: " + evento.getNombre());
                             System.out.println("Descripción: " + evento.getDescripcion());
                             System.out.println("Lugar: " + evento.getLugar());
@@ -185,29 +192,42 @@ public class App {
                     System.out.println("\nIntroduce el nombre del evento para comprar entrada:");
                     String eventoCompra = aux.Scanf.scanString();
 
+                    if(nombreEventos.contains(eventoCompra) == false) {
+                        App.clearConsole();
+                        System.out.println("\nEl evento introducido no existe");
+                        break;
+                    }
+
                     tipoTransaccion = interfazSeleccionarTipoCompra();
 
-                    System.out.println("\nEntradas disponibles para el evento: " + eventoCompra);
                     ArrayList<Entrada> entradasDisponibles = transaccionMgr.verEntradasPorEvento(eventoCompra,
                             tipoTransaccion);
-
+                            
                     if (entradasDisponibles.isEmpty()) {
+                        App.clearConsole();
                         System.out.println("No hay entradas disponibles para este evento.");
                         break;
-                    } else {
+                    }
 
-                        contador = 1;
+                    System.out.println("\nEntradas disponibles para el evento: " + eventoCompra);
+                    
+                    contador = 1;
 
-                        for (Entrada entrada : entradasDisponibles) {
-                            System.out.println("\n" + contador + ".- Tipo: " + entrada.getTipo());
-                            System.out.println("Precio: " + entrada.getPrecio() + "€");
-                            System.out.println("--------------------------");
-                            contador++;
-                        }
+                    for (Entrada entrada : entradasDisponibles) {
+                        System.out.println("\n" + contador + ".- Tipo: " + entrada.getTipo());
+                        System.out.println("Precio: " + entrada.getPrecio() + "€");
+                        System.out.println("--------------------------");
+                        contador++;
                     }
 
                     System.out.println("Selecciona la entrada:");
                     entradaSeleccionada = aux.Scanf.scanIntPositivo() - 1;
+
+                    if (entradaSeleccionada < 0 || entradaSeleccionada >= entradasDisponibles.size()) {
+                        App.clearConsole();
+                        System.out.println("\nSelección inválida.");
+                        break;
+                    }
 
                     entradaCompra = entradasDisponibles.get(entradaSeleccionada);
 
@@ -355,10 +375,13 @@ public class App {
 
         return tipoTransaccion;
     }
-     /**
-     * Muestra la interfaz de interacción para un organizador de eventos, 
-     * @param correoOrganizador Correo electrónico del organizador autenticado, usado para identificar sus eventos.
-     */
+    
+    /**
+     * Muestra el menú de opciones disponibles para un organizador autenticado y gestiona
+     * las acciones seleccionadas como publicar, modificar o cancelar eventos, y ver eventos.
+     *
+     * @param correoOrganizador El correo del organizador que ha iniciado sesión.
+     **/
     public static void interfazOrganizador(String correoOrganizador) {
         int opc;
         int contador = 0;
@@ -413,7 +436,7 @@ public class App {
                     System.out.println("\nIntroduce el precio de las entradas Generales:");
                     precio = aux.Scanf.scanFloatPositivo();
 
-                    entradas.add(EntradaFactory.createEntradaGeneralCompleto(precio, evento.getNombre(), cantidad, correoOrganizador));
+                    entradas.add(EntradaFactory.createEntradaGeneral(precio, evento.getNombre(), cantidad, correoOrganizador));
 
                     System.out.println("\nIntroduce la cantidad de entradas VIP:");
                     cantidad = aux.Scanf.scanIntPositivo();
@@ -421,7 +444,7 @@ public class App {
                     System.out.println("\nIntroduce el precio de las entradas VIP:");
                     precio = aux.Scanf.scanFloatPositivo();
 
-                    entradas.add(EntradaFactory.createEntradaVIPCompleto(precio, evento.getNombre(), cantidad, correoOrganizador));
+                    entradas.add(EntradaFactory.createEntradaVIP(precio, evento.getNombre(), cantidad, correoOrganizador));
 
                     System.out.println("\nIntroduce la cantidad de entradas Numeradas:");
                     cantidad = aux.Scanf.scanIntPositivo();
@@ -429,7 +452,7 @@ public class App {
                     System.out.println("\nIntroduce el precio de las entradas Numeradas:");
                     precio = aux.Scanf.scanFloatPositivo();
 
-                    entradas.add(EntradaFactory.createEntradaNumeradaCompleto(precio, evento.getNombre(), cantidad, correoOrganizador));
+                    entradas.add(EntradaFactory.createEntradaNumerada(precio, evento.getNombre(), cantidad, correoOrganizador));
 
                     boolean publicado = eventoMgr.publicarEvento(evento, entradas);
 
@@ -443,21 +466,11 @@ public class App {
                     System.out.println("Selecciona el evento que deseas modificar:");
                     eventos = eventoMgr.verEventosOrganizador(correoOrganizador);
 
-                    contador = 1;
+                    evento = interfazSeleccionarEvento(eventos);
 
-                    if (eventos.isEmpty()) {
-                        System.out.println("\nNo tienes eventos publicados");
+                    if(evento == null) {
                         break;
                     }
-
-                    for (Evento eventoDisponible : eventos) {
-                        System.out.println("\n" + contador + ".- " + eventoDisponible.getNombre());
-                        contador++;
-                    }
-
-                    eventoSeleccionado = aux.Scanf.scanInt() - 1;
-
-                    evento = eventos.get(eventoSeleccionado);
 
                     System.out.println("\nInformación del evento seleccionado:");
                     System.out.println("Nombre: " + evento.getNombre());
@@ -466,17 +479,17 @@ public class App {
                     System.out.println("Fecha: " + evento.getFecha());
                     System.out.println("LimiteReventa: " + evento.getLimiteReventa());
 
-                    System.out.println("Introduce la nueva descripción del evento:");
+                    System.out.println("\nIntroduce la nueva descripción del evento:");
                     evento.setDescripcion(aux.Scanf.scanString());
 
-                    System.out.println("Introduce el nuevo lugar del evento:");
+                    System.out.println("\nIntroduce el nuevo lugar del evento:");
                     evento.setLugar(aux.Scanf.scanString());
 
-                    System.out.println("Introduce la nueva fecha (formato yyyy-MM-dd):");
-                    evento.setFecha(aux.Scanf.scanFecha());
+                    System.out.println("\nIntroduce la nueva fecha (formato yyyy-MM-dd):");
+                    evento.setFecha(aux.Scanf.scanFechaFutura());
 
-                    System.out.println("Introduce el limite de reventa (0,%):");
-                    evento.setLimiteReventa(aux.Scanf.scanFloat());
+                    System.out.println("\nIntroduce el limite de reventa (0,%):");
+                    evento.setLimiteReventa(aux.Scanf.scanFloatEntre0y1());
 
                     boolean modificado = eventoMgr.modificarEvento(evento);
 
@@ -489,7 +502,7 @@ public class App {
 
                     break;
                 case 3: 
-                    System.out.println("Selecciona el evento que deseas cancelar:");
+                    System.out.println("\nSelecciona el evento que deseas cancelar:");
                     eventos = eventoMgr.verEventosOrganizador(correoOrganizador);
 
                     evento = interfazSeleccionarEvento(eventos);
@@ -552,14 +565,18 @@ public class App {
             return null;
         }
 
+        for (Evento eventoDisponible : eventos) {
+            System.out.println("\n" + contador + ".- " + eventoDisponible.getNombre());
+            contador++;
+        }
+
         do {
 
-            for (Evento eventoDisponible : eventos) {
-                System.out.println("\n" + contador + ".- " + eventoDisponible.getNombre());
-                contador++;
-            }
-
             eventoSeleccionado = aux.Scanf.scanInt() - 1;
+
+            if (eventoSeleccionado < 0 || eventoSeleccionado >= eventos.size()) {
+                System.out.println("\nSelección inválida.");
+            }
 
         } while (eventoSeleccionado < 0 || eventoSeleccionado >= eventos.size());
 

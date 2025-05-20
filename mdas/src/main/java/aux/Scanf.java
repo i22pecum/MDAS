@@ -6,21 +6,12 @@ import java.sql.Date;
 
 
 /**
- * Clase Scanf que proporciona métodos estáticos para leer entradas del usuario.
- * 
- * Esta clase contiene varios métodos estáticos para leer diferentes tipos de datos, como:
- * - Cadenas de texto (String)
- * - Enteros (int)
- * - Fechas (Date)
- * 
- * Los métodos de esta clase incluyen validación básica para asegurar que el usuario ingresa un valor válido.
+ * Clase que proporciona métodos estáticos para leer entradas del usuario.
  */
 public class Scanf{
 	
 	/**
 	 * Constructor de la clase Scanf.
-	 * 
-	 * Este es un constructor vacío que no realiza ninguna operación al ser llamado.
 	 */
 	public Scanf(){
 		
@@ -28,10 +19,7 @@ public class Scanf{
 	
 	/**
 	 * Lee una línea de texto desde la entrada estándar (teclado).
-	 * 
-	 * Este método solicita al usuario que ingrese una línea de texto a través de la consola 
-	 * y devuelve esa línea como un string.
-	 * 
+	 *
 	 * @return La línea de texto ingresada por el usuario.
 	 */
 	public static String scanString() {
@@ -45,10 +33,6 @@ public class Scanf{
 	
 	/**
 	 * Lee un número entero desde la entrada estándar (teclado).
-	 * 
-	 * Este método solicita al usuario que ingrese un número entero. Si el usuario ingresa 
-	 * un valor que no es un número entero, el método captura la excepción y solicita al usuario
-	 * que vuelva a introducir un valor válido.
 	 * 
 	 * @return El número entero ingresado por el usuario.
 	 */
@@ -69,6 +53,11 @@ public class Scanf{
 		return result;
 	}
 
+	/**
+	 * Lee un número entero positivo desde la entrada estándar (teclado).
+	 * 
+	 * @return El número entero positivo ingresado por el usuario.
+	 */
 	public static int scanIntPositivo() {
 		int result = 0;
 		do{
@@ -82,6 +71,11 @@ public class Scanf{
 		return result;
 	}
 
+	/**
+	 * Lee un número flotante desde la entrada estándar (teclado).
+	 * 
+	 * @return El número flotante ingresado por el usuario.
+	 */
 	public static float scanFloat() {
 		float result = 0; 
 		int aux = 0;
@@ -100,6 +94,11 @@ public class Scanf{
 		return result;
 	}
 
+	/**
+	 * Lee un número flotante positivo desde la entrada estándar (teclado).
+	 * 
+	 * @return El número flotante positivo ingresado por el usuario.
+	 */
 	public static float scanFloatPositivo() {
 		float result = 0;
 		do{
@@ -113,6 +112,11 @@ public class Scanf{
 		return result;
 	}
 
+	/**
+	 * Lee un número flotante entre 0 y 1 desde la entrada estándar (teclado).
+	 * 
+	 * @return El número flotante entre 0 y 1 ingresado por el usuario.
+	 */
 	public static float scanFloatEntre0y1() {
 		float result = 0;
 		do{
@@ -125,7 +129,11 @@ public class Scanf{
 		return result;
 	}
 
-	
+	/**
+	 * Lee una cadena con formato de DNI desde la entrada estándar (teclado).
+	 * El formato esperado es 8 dígitos seguidos de una letra.
+	 * @return El DNI ingresado por el usuario en formato correcto.
+	 */
 	public static String scanDni() {
 		String result = "";
 		Boolean valido = true;
@@ -144,6 +152,11 @@ public class Scanf{
 		return result;
 	}
 	
+	/**
+	 * Lee una cadena con formato de fecha desde la entrada estándar (teclado).
+	 * El formato esperado es "YYYY-MM-DD".
+	 * @return La fecha ingresada por el usuario.
+	 */
 	public static Date scanFecha() {
 		int aux = 0;
 		String fecha = "";
@@ -163,6 +176,11 @@ public class Scanf{
 		return result;
 	}
 
+	/**
+	 * Lee una cadena con formato de fecha futura desde la entrada estándar (teclado).
+	 * El formato esperado es "YYYY-MM-DD".
+	 * @return La fecha futura ingresada por el usuario.
+	 */
 	public static Date scanFechaFutura(){
 		Date fecha = null;
 		Boolean valido = false;

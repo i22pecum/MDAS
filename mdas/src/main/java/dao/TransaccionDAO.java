@@ -7,6 +7,9 @@ import aux.DBConnection;
 import java.sql.*;
 import dto.TipoTransaccion;
 
+/**
+ * Clase que gestiona la persistencia de las transacciones en la base de datos.
+ */
 public class TransaccionDAO {
 
     private SQLProperties sqlProperties;

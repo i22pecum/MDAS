@@ -1,7 +1,8 @@
 package mgr;
 
-/*
- * Esta clase debe de estar vacia porque no se van a implementar sus funciones
+/**
+ * Clase encarga de la logica de negocio relacionada con las reclamaciones.
+ * No esta implementada ya que no es uno de los componentes que hemos decidido implementar del sistema
  */
 public class Reclamacion_ConsultaMgr {
     
