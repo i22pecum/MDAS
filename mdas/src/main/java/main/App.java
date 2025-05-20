@@ -221,7 +221,7 @@ public class App {
 
                     break;
                 case 2:
-                    entradas = transaccionMgr.verEntradasUsuario(correoUsuario);
+                    entradas = transaccionMgr.verEntradasUsuarioSinReventa(correoUsuario);
                     contador = 1;
                     App.clearConsole();
 

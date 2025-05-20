@@ -96,6 +96,37 @@ public class EntradaDAO {
         return entradas;
     }
 
+    public ArrayList<Entrada> getEntradasByIdSinReventa(ArrayList<Integer> idEntradas) {
+        ArrayList<Entrada> entradas = new ArrayList<>();
+        String sql = sqlProperties.getSQLQuery("ver_entrada_sin_reventa");
+        DBConnection dbConnection = new DBConnection();
+        TipoEntrada tipoEntrada = null;
+        String nombreEvento = null;
+        Entrada entrada = null;
+        float precio = 0;
+        try {
+            Connection connection = dbConnection.getConnection();
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+
+            for (Integer id : idEntradas) {
+                pstmt.setInt(1, id);
+                ResultSet rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    tipoEntrada = TipoEntrada.valueOf(rs.getString("tipo"));
+                    precio = rs.getFloat("precio");
+                    nombreEvento = rs.getString("evento");
+                    entrada = EntradaFactory.createEntrada(tipoEntrada, precio, nombreEvento);
+                    entrada.setId(id);
+                    entradas.add(entrada);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return entradas;
+    }
+
     public Boolean eliminarEntradasVendidasByIdEntrada(ArrayList<Integer> idEntradas) {
         Boolean eliminado = false;
         String sql = sqlProperties.getSQLQuery("eliminar_entradas_vendidas");

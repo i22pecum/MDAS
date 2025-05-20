@@ -52,6 +52,33 @@ public class TransaccionMgr {
         return entradas;
     }
 
+    public ArrayList<Entrada> verEntradasUsuarioSinReventa(String correo) {
+        ArrayList<Entrada> entradas = new ArrayList<>();
+        ArrayList<Integer> idEntradas = new ArrayList<>();
+        ArrayList<Evento> eventos = new ArrayList<>();
+        ArrayList<String> nombreEventos = new ArrayList<>();
+        EntradaDAO entradaDAO = new EntradaDAO();
+        EventoDAO eventoDAO = new EventoDAO();
+
+        idEntradas = entradaDAO.getIdEntradasByCorreo(correo);
+
+        entradas = entradaDAO.getEntradasByIdSinReventa(idEntradas);
+
+        eventos = eventoDAO.listarEventosDisponibles();
+
+        for (Evento evento : eventos) {
+            nombreEventos.add(evento.getNombre());
+        }
+
+        for (Entrada entrada : entradas) {
+            if (nombreEventos.contains(entrada.getNombreEvento()) == false) {
+                entradas.remove(entrada);
+            }
+        }
+
+        return entradas;
+    }
+
 
     /**
      * Devuelve el dinero a los compradores y resta el saldo al vendedor en caso de cancelación de evento.
@@ -152,26 +179,25 @@ public class TransaccionMgr {
                 tipoTransaccion);
         TransaccionDAO transaccionDAO = new TransaccionDAO();
         OrganizadorDAO organizadorDAO = new OrganizadorDAO();
+        ArrayList<Integer> idEntradas = new ArrayList<>();
+        idEntradas.add(entrada.getId());
 
         
         entradaDAO.disminuirCantidadEntrada(entrada.getId());
-        
-        entradaDAO.insertarEntradaVendida(entrada.getId(), correoUsuario);
 
-        
         usuarioDAO.restarMonedero(correoUsuario, entrada.getPrecio());
-
         
         if (tipoTransaccion.equals(TipoTransaccion.VENTASECUNDARIA) == true) {
             usuarioDAO.recargarMonedero(entrada.getCorreoVendedor(), entrada.getPrecio());
+            entradaDAO.eliminarEntradasVendidasByIdEntrada(idEntradas);
         } else {
             
             organizadorDAO.recargarMonedero(entrada.getCorreoVendedor(), entrada.getPrecio());
         }
 
+        entradaDAO.insertarEntradaVendida(entrada.getId(), correoUsuario);
         
         transaccionDAO.insertarTransaccion(transaccion, entrada.getNombreEvento());
-
         
         return true;
     }
