@@ -15,6 +15,10 @@ public class TransaccionMgr {
     private TransaccionMgr() {
     }
 
+    /**
+     * Método para obtener la instancia única de TransaccionMgr (Singleton).
+     * @return Instancia única de TransaccionMgr.
+     */
     public static TransaccionMgr getInstance() {
         if (instance == null) {
             instance = new TransaccionMgr();

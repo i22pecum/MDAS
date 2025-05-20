@@ -18,6 +18,10 @@ public class EventoMgr {
     private EventoMgr() {
     }
 
+    /**
+     * Método para obtener la instancia única de EventoMgr (Singleton).
+     * @return Instancia única de EventoMgr.
+     */
     public static EventoMgr getInstance() {
         if (instance == null) {
             instance = new EventoMgr();

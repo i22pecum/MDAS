@@ -16,6 +16,10 @@ public class UsuarioMgr {
 
     private UsuarioMgr() {}
 
+    /**
+     * Método para obtener la instancia única de UsuarioMgr (Singleton).
+     * @return Instancia única de UsuarioMgr.
+     */
 	public static UsuarioMgr getInstance() {
 		if(instance == null) {
 			instance = new UsuarioMgr();
